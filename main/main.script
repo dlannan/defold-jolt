@@ -1,0 +1,267 @@
+
+tinsert 	= table.insert
+
+-- --------------------------------------------------------------------------------------------------------
+
+local mpool 		= require("gltfloader.meshpool")
+local geom 			= require("gltfloader.geometry-utils")
+local imageutils 	= require("gltfloader.image-utils")
+local gltf 			= require("gltfloader.gltfloader")
+
+local camdrive		= require("utils.camera-drive")
+
+local groundsize 	= 100
+local pdatasize		= groundsize
+
+-- --------------------------------------------------------------------------------------------------------
+
+function loadground(self) 
+
+	self.groundMesh = mpool.gettemp( "ground" )
+	geom:GeneratePlane( self.groundMesh.."#temp", groundsize, groundsize, groundsize )
+	imageutils.loadimage( self.groundMesh.."#temp", "/assets/images/brown.png", 0 )
+		
+	local pos = vmath.vector3(0, 0, 0)
+	go.set_position(pos, self.groundMesh)
+end
+
+-- --------------------------------------------------------------------------------------------------------
+
+function updateBodyObjects( self, bodies )
+
+	for k,v in pairs(self.bodies) do
+		local body = bodies[v.index]
+		if body then 
+			go.set_rotation( vmath.quat(body.rot.x,body.rot.y,body.rot.z,body.rot.w), v.geom)
+			go.set_position( vmath.vector3(body.pos.x,body.pos.y,body.pos.z), v.geom)
+		end
+	end
+end
+
+-- --------------------------------------------------------------------------------------------------------
+
+local function MakeMesh(k, name, coll)
+
+	local mesh =  mpool.gettemp( name )
+	
+	local mapping = 1
+	if(k == "cube") then mapping = 3 end 
+	if(k == "sphere") then mapping = 1 end 
+	if(k == "cylinder" or k == "chamfercylinder" or k == "capsule" ) then mapping = 2 end 
+	
+	local mid, indices, verts, uvs, normals = newton.createmeshfromcollision( coll, mapping )
+	local meshname = mesh.."#temp"
+	geom:GenerateFromMesh( meshname, verts, indices, uvs, normals )
+	imageutils.loadimage( meshname, "/assets/images/blue.png", 0 )	
+	return meshname, mesh
+end 
+
+-- --------------------------------------------------------------------------------------------------------
+
+function init(self)
+
+	msg.post(".", "acquire_input_focus")
+	msg.post("@render:", "use_camera_projection")
+	msg.post("camera", "acquire_camera_focus")
+
+	-- Second param regenerates meshes and go files
+	mpool.init(100)
+
+	-- position directional light
+	self.light = vmath.vector4(200.0, 200.0, 0.0, 0)
+		
+	loadground(self)
+
+	newton.create()
+	self.collground = newton.collision_addplane(100, 100)
+	self.collsphere = newton.collision_addsphere(1)
+	self.collcube = newton.collision_addcube(1.5, 1.5, 1.5)
+	self.collvehicle = newton.collision_addcube(3.0, 0.5, 5.0)
+	self.collcone = newton.collision_addcone(1, 2)
+	self.collcapsule = newton.collision_addcapsule(0.5, 0.5, 0.75)
+	self.collcylinder = newton.collision_addcylinder(0.7, 0.7, 2.0)
+	self.collchamfercylinder = newton.collision_addchamfercylinder(0.7, 0.2)
+	--self.collconvexhull = newton.collision_addconvexhull(24, vertcloud)
+
+	self.bodies = {}
+	self.physics_ground = { 
+		index = newton.body_add(self.collground, 0,0,0, 0),
+		coll = self.collground,
+		name = "plane",
+	}  -- infinite mass is 0
+-- 	self.bodies.sphere1 = 
+-- 	{ 
+-- 		index = newton.body_add(self.collsphere, 00,10,0, 2),
+-- 		coll = self.collsphere ,
+-- 		name = "sphere1",
+-- 	}
+-- 	self.bodies.sphere2 = { 
+-- 		index = newton.body_add(self.collsphere, 0,20,0, 1),
+-- 		coll = self.collsphere ,
+-- 		name = "sphere2",	
+-- 	}
+-- 	self.bodies.cube = { 
+-- 		index = newton.body_add(self.collcube, 0,19,0, 2),
+-- 		coll = self.collcube,
+-- 		name = "cube",
+-- 	}
+-- 
+	self.bodies.vehicle = { 
+		index = newton.body_add(self.collvehicle, 0, 19, 0, 2),
+		coll = self.collvehicle,
+		name = "vehicle",
+	}
+	self.bodies.vehicle.multibody =  { }
+	local vid = newton.vehicle_add( self.bodies.vehicle.index, 0, 19, 0 )
+	self.bodies.vehicle.multibody.vid = vid
+	self.bodies.vehicle.multibody.wheels = { 
+		newton.vehicle_addtire(vid, 0.15, 0.5, -2, 0.0, -2.0),
+		newton.vehicle_addtire(vid, 0.15, 0.5, 2, 0.0, -2.0),
+		newton.vehicle_addtire(vid, 0.15, 0.5, -2, 0.0, 2.0),
+		newton.vehicle_addtire(vid, 0.15, 0.5, 2, 0.0, 2.0),
+	}
+	newton.vehicle_finalize()
+	
+	-- self.bodies.cone = { 
+	-- 	index = newton.body_add(self.collcone, 0,18,0, 3) ,
+	-- 	coll = self.collcone,
+	-- 	name = "cone",
+	-- }
+	-- self.bodies.capsule = { 
+	-- 	index = newton.body_add(self.collcapsule, 0,17,4, 1) ,
+	-- 	coll = self.collcapsule,
+	-- 	name = "capsule",
+	-- }
+	-- self.bodies.cylinder = { 
+	-- 	index = newton.body_add(self.collcylinder, 0, 16,5, 1),
+	-- 	coll = self.collcylinder,
+	-- 	name = "cylinder",
+	-- }
+	-- self.bodies.chamfercylinder = { 
+	-- 	index = newton.body_add(self.collchamfercylinder, 0,15,6, 1) ,
+	-- 	coll = self.collchamfercylinder,
+	-- 	name = "chamfercylinder",
+	-- }
+
+	for k,v in pairs(self.bodies) do 
+		print(k)
+		_, v.geom = MakeMesh(k, v.name, v.coll)
+		if(v.name == "vehicle") then 
+			v.multibody.wheelmeshes = {}
+			for i, j in ipairs(v.multibody.wheels) do
+				print(i,j)
+				_, v.multibody.wheelmeshes[i] = MakeMesh("wheel"..k, v.name.."wheel"..i, j)
+			end 
+		end
+	end 
+
+	camdrive.init("/camera")
+			
+	-- gltf:load("/assets/models/demo_grass01/demo_grass01.gltf", "/temp/temp006", "temp")
+	-- go.set_rotation(vmath.quat_rotation_y(3.141 * 0.5), "/temp/temp006")
+	-- 
+	self.time_speed = 0.1
+
+	mpool.updateall( function( meshobj ) 
+		local m = go.get_world_transform(meshobj.goname)
+		model.set_constant(meshobj.goname, "light", self.light)
+	end )
+
+	-- Toggle the visual profiler on hot reload.
+	self.profile = false
+	profiler.enable_ui(self.profile)
+
+	self.ts = os.clock()
+end
+
+-- --------------------------------------------------------------------------------------------------------
+
+function update(self, delta)
+
+	local newt = os.clock()
+	local diff = newt-self.ts 
+	self.ts = newt 
+	
+	-- Update returns all the current bodies position and rotation info. { { pos = { x,y,z }, rot = { x, y, z, w } }
+	-- This forces a minimum of 60Hz physics - this may be too quick.
+	local bodies = newton.update(math.max(delta, diff))
+	updateBodyObjects( self, bodies )
+	
+	camdrive.update(self, diff)
+
+	local radA = os.clock() * self.time_speed
+	--self.light = vmath.vector4( math.cos(radA) * 200.0, math.sin(radA) * 200, 0.0, 0.0)
+end
+
+-- --------------------------------------------------------------------------------------------------------
+
+function on_input(self, action_id, action)
+
+	-- move directional light based on input
+	-- self.light.x = 10 * ((action.x - 480) / 480)
+	-- self.light.y = 10 * ((action.y - 320) / 320)
+	-- self.light.z = 5.0
+	-- 	
+	-- Check some keys - 1, 2, 3 for profiling
+	if(action.released) then 
+		if action_id == hash("zero") then
+			self.profile = not self.profile
+			profiler.enable_ui(self.profile)
+		end 
+		if action_id == hash("one") then
+			profiler.set_ui_mode(profiler.MODE_RUN)
+		end 
+		if action_id == hash("two") then
+			profiler.set_ui_mode(profiler.MODE_PAUSE)
+		end
+		if action_id == hash("three") then
+			profiler.set_ui_mode(profiler.MODE_RECORD)
+		end		
+
+		if action_id == hash("camerafwd")
+			or action_id == hash("camerabck") then
+			camdrive.speed = 0.0
+		end
+	end
+
+	if(action.pressed) then 
+		if action_id == hash("camerafwd") then
+			camdrive.speed = 62.0
+		end 
+		if action_id == hash("camerabck") then
+			camdrive.speed = -62.0
+		end 
+		if action_id == hash("cameraleft") then
+		end 
+		if action_id == hash("cameraright") then
+		end 
+	end
+
+	if action_id == hash("touch") then
+		if action.pressed then
+			self.mouse1_down = true
+		elseif action.released then
+			self.mouse1_down = nil
+		end
+	end	
+
+	if self.mouse1_down then  
+		camdrive.xangle = camdrive.xangle + action.dx * 0.001
+		camdrive.yangle = camdrive.yangle + action.dy * 0.001
+	end
+end
+
+-- --------------------------------------------------------------------------------------------------------
+
+function on_message(self, message_id, message)	
+
+end
+
+-- --------------------------------------------------------------------------------------------------------
+
+function on_reload(self)
+	-- Toggle the visual profiler on hot reload.
+	profiler.enable_ui(true)
+end
+
+-- --------------------------------------------------------------------------------------------------------

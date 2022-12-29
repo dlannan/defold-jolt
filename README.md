@@ -1,2 +1,2 @@
-# defold-jolt
-A native extension for the jolt physics engine
+# defold-newton
+A phsyics extension for Defold based on newton-physics engine. 
