@@ -9,8 +9,8 @@
 
 #include <dMatrix.h>
 
-#ifndef _EXTENSION_NEWTON_BODY_HEADER_
-#define _EXTENSION_NEWTON_BODY_HEADER_
+#ifndef _EXTENSION_JOLT_BODY_HEADER_
+#define _EXTENSION_JOLT_BODY_HEADER_
 
 // External Body
 extern int addBody( lua_State *L );
@@ -24,4 +24,4 @@ extern int bodySetMassMatrix( lua_State *L );
 extern int bodyGetCentreOfMass( lua_State *L );
 extern int bodySetForceAndTorqueCallback( lua_State *L );
 
-#endif // _EXTENSION_NEWTON_BODY_HEADER_
+#endif // _EXTENSION_JOLT_BODY_HEADER_

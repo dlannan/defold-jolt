@@ -6,13 +6,10 @@
 // include the Defold SDK
 #include <dmsdk/sdk.h>
 #include <stdlib.h>
-#include <joltc.h>
 #include <vector>
 #include <map>
 
-#include "extension-collision.h"
-#include "extension-body.h"
-#include "extension-vehicle.h"
+#include <extension.h>
 
 JPH_PhysicsSystem* gWorld = NULL;
 JPH_BodyInterface* gInterface = NULL;
@@ -98,9 +95,9 @@ void Close( void )
     // for ( ; bodyit != gBodies.end(); ++bodyit )        
     //     JoltDestroyBody(bodyit->second);
 
-    gColls.clear();
-    gBodies.clear();
-    gMeshes.clear();
+    //gColls.clear();
+    //gBodies.clear();
+    //gMeshes.clear();
 
     if(gWorld) JoltDestroy(gWorld);
     gWorld = NULL;

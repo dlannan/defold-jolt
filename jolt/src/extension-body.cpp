@@ -15,8 +15,8 @@ void cb_applyForce(const NewtonBody* const body, dFloat timestep, int threadInde
     //NewtonBodyGetPosition(body, pos);
 
     // Apply force.
-    dFloat force[3] = {0, -9.8, 0};
-    NewtonBodySetForce(body, force);
+    // dFloat force[3] = {0, -9.8, 0};
+    // NewtonBodySetForce(body, force);
 
     // Print info to terminal.
     //printf("BodyID=%d, Sleep=%d, %.2f, %.2f, %.2f\n",
@@ -40,20 +40,20 @@ void cb_applyForce(const NewtonBody* const body, dFloat timestep, int threadInde
     double z = lua_tonumber(L, 4);
     double mass = lua_tonumber(L, 5);
 
-    tm[12] = x; tm[13] = y; tm[14] = z;
-    // NewtonBody *body = NewtonCreateDynamicBody(gWorld, gColls[idx], tm);
-    JPH_BodyID body = JPH_BodyInterface_CreateAndAddBody();
-
-    gBodies[idx] = body;
-
-    // NewtonBodySetForceAndTorqueCallback(body, cb_applyForce);
-
-    // Assign non-zero mass to sphere to make it dynamic.
-    NewtonBodySetMassMatrix(body, mass, 1, 1, 1);
-    
-    UserData *myData = new UserData[2];
-    myData[0].bodyID = idx;
-    NewtonBodySetUserData(body, (void *)&myData[0]);
+//     tm[12] = x; tm[13] = y; tm[14] = z;
+//     // NewtonBody *body = NewtonCreateDynamicBody(gWorld, gColls[idx], tm);
+//     JPH_BodyID body = JPH_BodyInterface_CreateAndAddBody();
+// 
+//     gBodies[idx] = body;
+// 
+//     // NewtonBodySetForceAndTorqueCallback(body, cb_applyForce);
+// 
+//     // Assign non-zero mass to sphere to make it dynamic.
+//     NewtonBodySetMassMatrix(body, mass, 1, 1, 1);
+//     
+//     UserData *myData = new UserData[2];
+//     myData[0].bodyID = idx;
+//     NewtonBodySetUserData(body, (void *)&myData[0]);
     
     lua_pushnumber(L, idx);
     return 1;
@@ -72,7 +72,7 @@ void cb_applyForce(const NewtonBody* const body, dFloat timestep, int threadInde
     dFloat Ixx = 0.0f;
     dFloat Iyy = 0.0f;
     dFloat Izz = 0.0f;
-    NewtonBodyGetMass( gBodies[bodyindex], &mass, &Ixx, &Iyy, &Izz);
+    // NewtonBodyGetMass( gBodies[bodyindex], &mass, &Ixx, &Iyy, &Izz);
     lua_pushnumber(L, mass );
     lua_pushnumber(L, Ixx );
     lua_pushnumber(L, Iyy );
@@ -99,7 +99,7 @@ int bodySetMassProperties( lua_State *L )
 
     float mass = lua_tonumber(L, 3);
 
-    NewtonBodySetMassProperties( bodyit->second, mass, collit->second );
+    // NewtonBodySetMassProperties( bodyit->second, mass, collit->second );
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -130,9 +130,9 @@ int bodySetUserData( lua_State *L )
 
     // Grab the ref to the table passed in as the second arg
     int tableref = luaL_ref(L, LUA_REGISTRYINDEX);
-    std::pair<uint32_t, int> tuple(bodyindex, tableref);
-    bodyUserData.insert(tuple);
-
+//     std::pair<uint32_t, int> tuple(bodyindex, tableref);
+//     bodyUserData.insert(tuple);
+// 
     //NewtonBodySetUserData(gBodies[bodyindex], &tuple.second());
     lua_pushnumber(L, 1);
     return 1;
@@ -147,7 +147,7 @@ int bodySetLinearDamping( lua_State *L )
         return 1;
     }    
     float damping = lua_tonumber(L, 2);
-    NewtonBodySetLinearDamping( gBodies[bodyindex], damping );
+    // NewtonBodySetLinearDamping( gBodies[bodyindex], damping );
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -161,7 +161,7 @@ int bodySetAngularDamping( lua_State *L )
         return 1;
     }    
     dFloat damping[4] = { (float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3), (float)lua_tonumber(L, 4), (float)lua_tonumber(L, 5) };
-    NewtonBodySetAngularDamping( gBodies[bodyindex], (dFloat *)&damping );
+    //NewtonBodySetAngularDamping( gBodies[bodyindex], (dFloat *)&damping );
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -178,7 +178,7 @@ int bodySetMassMatrix( lua_State *L )
     dFloat Ixx = (dFloat)lua_tonumber(L, 3);
     dFloat Iyy = (dFloat)lua_tonumber(L, 4);
     dFloat Izz = (dFloat)lua_tonumber(L, 5);
-    NewtonBodySetMassMatrix( gBodies[bodyindex],  mass, Ixx, Iyy, Izz );
+    //NewtonBodySetMassMatrix( gBodies[bodyindex],  mass, Ixx, Iyy, Izz );
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -192,7 +192,7 @@ int bodyGetCentreOfMass( lua_State *L )
         return 1;
     }   
     float center[3];
-    NewtonBodyGetCentreOfMass( gBodies[bodyindex], center);
+   // NewtonBodyGetCentreOfMass( gBodies[bodyindex], center);
 
     lua_pushnumber(L, center[0]);
     lua_pushnumber(L, center[1]);
@@ -238,8 +238,8 @@ int bodySetForceAndTorqueCallback( lua_State *L )
         return 1;
     }   
     int function_ref = luaL_ref(L, LUA_REGISTRYINDEX);
-    bodyCallback[(NewtonBody *)gBodies[bodyindex]] = function_ref;
-    NewtonBodySetForceAndTorqueCallback( gBodies[bodyindex], __applyForceAndTorqueCallback);
+    //bodyCallback[(NewtonBody *)gBodies[bodyindex]] = function_ref;
+    //NewtonBodySetForceAndTorqueCallback( gBodies[bodyindex], __applyForceAndTorqueCallback);
     lua_pushnumber(L, 1);
     return 1;
 }

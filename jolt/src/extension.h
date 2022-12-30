@@ -3,24 +3,23 @@
 // include the Defold SDK
 #include <dmsdk/sdk.h>
 #include <stdlib.h>
-#include <Newton.h>
 #include <vector>
 #include <map>
 
-#include <dMatrix.h>
+#ifndef _EXTENSION_JOLT_HEADER_
+#define _EXTENSION_JOLT_HEADER_
 
-#ifndef _EXTENSION_NEWTON_HEADER_
-#define _EXTENSION_NEWTON_HEADER_
+#include <joltc.h>
 
-extern NewtonWorld* gWorld;
+extern JPH_PhysicsSystem* gWorld;
+extern JPH_BodyInterface* gInterface;
 
-extern std::map<uint32_t, JPH_BodyID > gBodies;
-extern std::map<uint32_t, NewtonCollision*> gColls;
-extern std::map<uint32_t, NewtonMesh* >gMeshes;
+extern std::map<uint32_t, JPH_BodyID >     gBodies;
+extern std::map<uint32_t, JoltCollision*>  gColls;
+extern std::map<uint32_t, JoltMesh* >      gMeshes;
 
-
-extern std::map<uint32_t, int>   bodyUserData;
-extern std::map<NewtonBody* , int>   bodyCallback;
+//extern std::map<uint32_t, int>   bodyUserData;
+//extern std::map<NewtonBody* , int>   bodyCallback;
 
 extern lua_State *gCbL;
 

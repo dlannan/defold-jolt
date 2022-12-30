@@ -6,6 +6,7 @@ name: "Jolt"
 platforms:
     x86_64-osx:
         context:
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeSymbols: []
             symbols: []
@@ -15,7 +16,8 @@ platforms:
 
     x86_64-linux:
         context:
-            defines: []
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeSymbols: []
             symbols: []
@@ -42,8 +44,8 @@ platforms:
 
     x86-win32:
         context:
-            defines: []
-            flags: ["-stdlib=libc++"]
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["libphysics","libLinearMath","libBulletDynamics","libBulletCollision","libBox2D"]
             excludeSymbols: []
             symbols: []
@@ -52,8 +54,8 @@ platforms:
 
     x86_64-win32:
         context:
-            defines: []
-            flags: ["-stdlib=libc++"]
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["libphysics","libLinearMath","libBulletDynamics","libBulletCollision","libBox2D"]
             excludeSymbols: []
             symbols: []
@@ -62,6 +64,8 @@ platforms:
 
     armv7-android:
         context:
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeJars: []
             excludeSymbols: []
@@ -72,6 +76,8 @@ platforms:
 
     arm64-android:
         context:
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeJars: []
             excludeSymbols: []
@@ -82,6 +88,8 @@ platforms:
 
     armv7-ios:
         context:
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeSymbols: []
             symbols: []
@@ -91,6 +99,8 @@ platforms:
 
     arm64-ios:
         context:
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeSymbols: []
             symbols: []
@@ -100,6 +110,8 @@ platforms:
 
     x86_64-ios:
         context:
+            defines: ["JPH_DOUBLE_PRECISION"]
+            flags: ["-stdlib=libc++", "-std=c++17"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeSymbols: []
             symbols: []

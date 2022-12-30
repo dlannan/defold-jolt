@@ -15,7 +15,7 @@ package = com.defold.example.basic3d
 
 [project]
 dependencies = 
-title = VerletPhysics
+title = JoltPhysics
 custom_resources = assets
 bundle_exclude_resources = 
 

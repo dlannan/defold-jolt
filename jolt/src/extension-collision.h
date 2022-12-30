@@ -3,14 +3,11 @@
 // include the Defold SDK
 #include <dmsdk/sdk.h>
 #include <stdlib.h>
-#include <Newton.h>
 #include <vector>
 #include <map>
 
-#include <dMatrix.h>
-
-#ifndef _EXTENSION_NEWTON_COLLISION_HEADER_
-#define _EXTENSION_NEWTON_COLLISION_HEADER_
+#ifndef _EXTENSION_JOLT_COLLISION_HEADER_
+#define _EXTENSION_JOLT_COLLISION_HEADER_
 
 // External collision 
 extern int addCollisionSphere( lua_State * L );
@@ -27,4 +24,4 @@ extern int createMeshFromCollision( lua_State *L );
 
 extern int worldRayCast( lua_State *L );
 
-#endif // _EXTENSION_NEWTON_COLLISION_HEADER_
+#endif // _EXTENSION_JOLT_COLLISION_HEADER_

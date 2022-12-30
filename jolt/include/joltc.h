@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ï¿½ Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 #ifndef _JOLT_C_H
@@ -36,7 +36,7 @@
 #endif
 
 
-#define JPH_CAPI _JPH_EXTERN _JPH_EXPORT
+#define JPH_CAPI _JPH_EXTERN 
 
 #include <stdbool.h>
 #include <stddef.h>
