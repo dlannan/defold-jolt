@@ -3,11 +3,8 @@
 // include the Defold SDK
 #include <dmsdk/sdk.h>
 #include <stdlib.h>
-#include <Newton.h>
 #include <vector>
 #include <map>
-
-#include <dMatrix.h>
 
 #ifndef _EXTENSION_JOLT_BODY_HEADER_
 #define _EXTENSION_JOLT_BODY_HEADER_

@@ -6,6 +6,7 @@
 // include the Defold SDK
 #include <dmsdk/sdk.h>
 #include <stdlib.h>
+#include <joltc.h>
 #include <vector>
 #include <map>
 
@@ -15,7 +16,7 @@ JPH_PhysicsSystem* gWorld = NULL;
 JPH_BodyInterface* gInterface = NULL;
 
 std::map<uint32_t, JPH_BodyID >     gBodies;
-std::map<uint32_t, JoltCollision*>  gColls;
+std::map<uint32_t, JoltCollision>   gColls;
 std::map<uint32_t, JoltMesh* >      gMeshes;
 
 std::map<uint32_t, int>             bodyUserData;
@@ -42,6 +43,9 @@ static int Create( lua_State *L )
 
     // Create the Jolt world.
     gWorld = JPH_PhysicsSystem_Create();
+    using BPLayerInterfaceImpl broadPhaseLayer = new();
+
+    JPH_PhysicsSystem_Init(gWorld, maxBodies, numBodyMutexes, maxBodyPairs, maxConstraints, layer, layerFilter, pairFilter);
     gInterface = JPH_PhysicsSystem_GetBodyInterface(gWorld);
 
     VehiclesInit();
@@ -85,19 +89,19 @@ static int Update( lua_State *L )
 void Close( void )
 {
     // Clean up.
-    std::map<uint32_t, JoltMesh*>::iterator meshit = gMeshes.begin();
-    for ( ; meshit != gMeshes.end(); ++meshit )
-        JoltMeshDestroy(meshit->second);
-    std::map<uint32_t, JoltCollision*>::iterator collit = gColls.begin();
-    for ( ; collit != gColls.end(); ++collit )
-        JoltDestroyCollision(collit->second);
+    // std::map<uint32_t, JoltMesh*>::iterator meshit = gMeshes.begin();
+    // for ( ; meshit != gMeshes.end(); ++meshit )
+    //     JoltMeshDestroy(meshit->second);
+    // std::map<uint32_t, JoltCollision>::iterator collit = gColls.begin();
+    // for ( ; collit != gColls.end(); ++collit )
+    //     JoltDestroyCollision(collit->second);
     // std::map<uint32_t, JoltBody*>::iterator bodyit = gBodies.begin();
     // for ( ; bodyit != gBodies.end(); ++bodyit )        
     //     JoltDestroyBody(bodyit->second);
 
-    //gColls.clear();
-    //gBodies.clear();
-    //gMeshes.clear();
+    gColls.clear();
+    gBodies.clear();
+    gMeshes.clear();
 
     if(gWorld) JoltDestroy(gWorld);
     gWorld = NULL;
