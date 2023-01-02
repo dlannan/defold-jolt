@@ -14,24 +14,18 @@
 extern JPH_PhysicsSystem* gWorld;
 extern JPH_BodyInterface* gInterface;
 
-typedef struct JoltCollision {
-    union {
-        JPH_BoxShape *                      box;
-        JPH_SphereShape *                   sphere;
-        JPH_TriangleShapeSettings *         tri;
-        JPH_CapsuleShapeSettings *          cap;
-        JPH_CylinderShapeSettings *         cyl;
-        JPH_ConvexHullShapeSettings *       cvHull;
-        JPH_MeshShapeSettings *             mesh;
-        JPH_HeightFieldShapeSettings *      hMap;
-        JPH_TaperedCapsuleShapeSettings *   taper;
-    } shape;
+typedef struct JoltBody {
+    JPH_BodyID  id;
+    Body *      body;
+    float       mass;
+} JoltBody;
 
-} JoltCollision;
+typedef struct JoltMesh {
+    JPH_Triangle    triangles;
+    uint32_t        count;
+} JoltMesh;
 
-
-extern std::map<uint32_t, JPH_BodyID >     gBodies;
-extern std::map<uint32_t, JoltCollision>  gColls;
+extern std::map<uint32_t, JoltBolt* >      gBodies;
 extern std::map<uint32_t, JoltMesh* >      gMeshes;
 
 //extern std::map<uint32_t, int>   bodyUserData;

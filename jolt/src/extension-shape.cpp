@@ -14,96 +14,132 @@ enum ShapeType {
     Shape_ConvexHull      
 }; 
 
-int addCollisionSphere( lua_State * L ) {
+int addShapeSphere( lua_State * L ) {
 
     double radii = lua_tonumber(L, 1);
-    // Collision shapes: sphere (our ball), and large box (our ground plane).
-    //NewtonCollision* cs_object = NewtonCreateSphere(gWorld, radii, Shape_Sphere, NULL);
+	RefConst<Shape> sphere_shape = new SphereShape(radii);
+    RVec3 position(0.0f, 0.0f, 0.0f);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(sphere_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
     uint32_t index = GetId();
-    //gColls[index] = cs_object;
+    gBodies[index] = newbody;
     lua_pushnumber(L, index);
     return 1;
 }
 
- int addCollisionPlane( lua_State * L ) {
+ int addShapePlane( lua_State * L ) {
 
     double width = lua_tonumber(L, 1);
     double depth = lua_tonumber(L, 2);
-    // Collision shapes: sphere (our ball), and large box (our ground plane).
-    //NewtonCollision* cs_object = NewtonCreateBox(gWorld, width, 0.1, depth, Shape_Plane, NULL);
+	RefConst<Shape> box_shape = new BoxShape(Vec3(width, 0.1f, depth));
+    RVec3 position(0.0f, 0.0f, 0.0f);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(box_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
     uint32_t index = GetId();
-    //gColls[index] = cs_object;
-    lua_pushnumber(L,index);
+    gBodies[index] = newbody;
+    lua_pushnumber(L, index);
     return 1;
 }
 
-int addCollisionCube( lua_State * L ) {
+int addShapeCube( lua_State * L ) {
 
     double sx = lua_tonumber(L, 1);
     double sy = lua_tonumber(L, 2);
     double sz = lua_tonumber(L, 3);
-    //NewtonCollision* cs_object = NewtonCreateBox(gWorld, sx, sy, sz, Shape_Cube, NULL);
+	RefConst<Shape> box_shape = new BoxShape(Vec3(sx, sy, sz));
+    RVec3 position(0.0f, 0.0f, 0.0f);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(box_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
     uint32_t index = GetId();
-    //gColls[index] = cs_object;
+    gBodies[index] = newbody;
     lua_pushnumber(L, index);
     return 1;
 }
 
-int addCollisionCone( lua_State * L ) {
+int addShapeCone( lua_State * L ) {
 
     double radius = lua_tonumber(L, 1);
     double height = lua_tonumber(L, 2);
-    //NewtonCollision* cs_object = NewtonCreateCone(gWorld, radius, height, Shape_Cone, NULL);
+	RefConst<Shape> cyl_shape = new CylinderShape(height/2, radius, 0.0f);
+    RVec3 position(0.0f, 0.0f, 0.0f);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cyl_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
     uint32_t index = GetId();
-    //gColls[index] = cs_object;
+    gBodies[index] = newbody;    
     lua_pushnumber(L, index);
     return 1;
 }
 
-int addCollisionCapsule( lua_State * L ) {
+int addShapeCapsule( lua_State * L ) {
+
+    double r0 = lua_tonumber(L, 1);
+    double height = lua_tonumber(L, 3);
+	RefConst<Shape> cap_shape = new CapsuleShape(height/2, r0);
+    RVec3 position(0.0f, 0.0f, 0.0f);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cap_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    uint32_t index = GetId();
+    gBodies[index] = newbody;    
+    lua_pushnumber(L, index);
+    return 1;
+}
+
+int addShapeCylinder( lua_State * L ) {
 
     double r0 = lua_tonumber(L, 1);
     double r1 = lua_tonumber(L, 2);
     double height = lua_tonumber(L, 3);
-    //NewtonCollision* cs_object = NewtonCreateCapsule(gWorld, r0, r1, height, Shape_Capsule, NULL);
+	RefConst<Shape> cyl_shape = new CylinderShape(height/2, r0, r1);
+    RVec3 position(0.0f, 0.0f, 0.0f);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cyl_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
     uint32_t index = GetId();
-    //gColls[index] = cs_object;
+    gBodies[index] = newbody;
     lua_pushnumber(L, index);
     return 1;
 }
 
-int addCollisionCylinder( lua_State * L ) {
-
-    double r0 = lua_tonumber(L, 1);
-    double r1 = lua_tonumber(L, 2);
-    double height = lua_tonumber(L, 3);
-    //NewtonCollision* cs_object = NewtonCreateCylinder(gWorld, r0, r1, height, Shape_Cylinder, NULL);
-    uint32_t index = GetId();
-    //gColls[index] = cs_object;
-    lua_pushnumber(L, index);
-    return 1;
-}
-
-int addCollisionChamferCylinder( lua_State * L ) {
+int addShapeChamferCylinder( lua_State * L ) {
 
     double radius = lua_tonumber(L, 1);
     double height = lua_tonumber(L, 2);
-    //NewtonCollision* cs_object = NewtonCreateChamferCylinder(gWorld, radius, height,Shape_ChamferCylinder, NULL);
+	RefConst<Shape> cyl_shape = new CylinderShape(height/2, radius);
+    RVec3 position(0.0f, 0.0f, 0.0f);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cyl_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
     uint32_t index = GetId();
-    //gColls[index] = cs_object;
+    gBodies[index] = newbody;
     lua_pushnumber(L, index);
     return 1;
 }
 
-int addCollisionConvexHull( lua_State * L ) {
+int addShapeConvexHull( lua_State * L ) {
 
     double count = lua_tonumber(L, 1);
-    int stride = lua_tonumber(L, 2);
-    double tolerance = lua_tonumber(L, 3);
-    const float *vertCloud = (float *)lua_topointer(L, 4);
-    //NewtonCollision* cs_object = NewtonCreateConvexHull(gWorld, count, vertCloud, stride, tolerance, Shape_ConvexHull, NULL);
+    const Vec3 *vertCloud = (Vec3 *)lua_topointer(L, 2);
+
+    ConvexHullShapeSettings settings(vertCloud, count);
+   	RefConst<Shape> convhull_shape = new ConvexHullShape(settings);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = mBodyInterface->CreateBody(convhull_shape);
+    newbody->id = = JPH_Body_GetID(newbody->body);
+    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
     uint32_t index = GetId();
-    //gColls[index] = cs_object;
+    gBodies[index] = newbody;
     lua_pushnumber(L, index);
     return 1;
 }
@@ -120,33 +156,33 @@ int addCollisionConvexHull( lua_State * L ) {
     return 0;
 }
 
-int destroyCollision(lua_State *L)
+int destroyShape(lua_State *L)
 {
     uint32_t collindex = lua_tonumber(L, 1);
-	std::map<uint32_t, JoltCollision>::iterator it = gColls.find(collindex);
-    if(it == gColls.end()) {
+	std::map<uint32_t, JoltShape>::iterator it = gBodies.find(collindex);
+    if(it == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }
-    //NewtonDestroyCollision(it->second);
-    //gColls.erase(it);
+    JPH_Shape_Destroy(it->second->body->GetShape());
+    gBodies.erase(it);
     lua_pushnumber(L, 1);
     return 1;
 }
 
-int createMeshFromCollision( lua_State *L )
+int createMeshFromShape( lua_State *L )
 {
     uint32_t collindex = lua_tonumber(L, 1);
-	std::map<uint32_t, JoltCollision>::iterator it = gColls.find(collindex);
-    if(it == gColls.end()) {
+	std::map<uint32_t, JoltShape>::iterator it = gBodies.find(collindex);
+    if(it == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }
 
     uint32_t mapping = lua_tonumber(L, 2);
-    //const NewtonCollision *collision = gColls[collindex];
+    const Shape *collision = gBodies[collindex]->body->GetShape();
 
-    //NewtonMesh *mesh = NewtonMeshCreateFromCollision( collision );
+    //NewtonMesh *mesh = NewtonMeshCreateFromShape( collision );
     // if(mesh) {
     //     uint32_t index = GetId();
     //     gMeshes[index] = mesh;

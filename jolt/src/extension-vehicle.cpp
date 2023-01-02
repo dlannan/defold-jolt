@@ -15,7 +15,7 @@
 
 
 //static dVehicleManager* gManager = NULL;
-//std::map<uint32_t, dMultiBodyVehicle *> gVehicles;
+std::map<uint32_t, JoltBody *> gVehicles;
 
 void VehiclesInit() {
     //gManager = new dVehicleManager( gWorld );
@@ -30,16 +30,16 @@ void VehiclesShutdown() {
 int VehicleAdd( lua_State *L ) {
 
     uint32_t bodyindex = lua_tonumber(L, 1);
-	std::map<uint32_t, NewtonBody *>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }
 
     //dMatrix frame(dGetIdentityMatrix());
-    frame.m_posit.m_x = lua_tonumber(L, 2);
-    frame.m_posit.m_y = lua_tonumber(L, 3);
-    frame.m_posit.m_z = lua_tonumber(L, 4);
+    // frame.m_posit.m_x = lua_tonumber(L, 2);
+    // frame.m_posit.m_y = lua_tonumber(L, 3);
+    // frame.m_posit.m_z = lua_tonumber(L, 4);
 
    //NewtonBody *body = gBodies[bodyindex];
 
@@ -55,13 +55,13 @@ int VehicleAdd( lua_State *L ) {
 int VehicleAddTire( lua_State *L ) {
 
     uint32_t vehicleindex = lua_tonumber(L, 1);
-	std::map<uint32_t, dMultiBodyVehicle *>::iterator it = gVehicles.find(vehicleindex);
+    std::map<uint32_t, JoltBody *>::iterator it = gVehicles.find(vehicleindex);
     if(it == gVehicles.end())
 	{
         lua_pushnil(L);
         return 1;
     }
-    dMultiBodyVehicle *vehicle = it->second;
+//    dMultiBodyVehicle *vehicle = it->second;
 
 //     dFloat width = (dFloat)lua_tonumber(L, 2);
 //     dFloat radius = (dFloat)lua_tonumber(L, 3);
@@ -96,7 +96,7 @@ int VehicleAddTire( lua_State *L ) {
 //     brakeControl->SetBrakeTorque(1000.0f);
 //     brakeControl->AddTire(tire);
 // 
-//     uint32_t index = GetId();
+     uint32_t index = GetId();
 //     gColls[index] = tire->GetCollisionShape();
     lua_pushnumber(L, index);
     return 1;
@@ -105,7 +105,7 @@ int VehicleAddTire( lua_State *L ) {
 int VehicleFinalize( lua_State *L )
 {
     uint32_t vehicleindex = lua_tonumber(L, 1);
-	std::map<uint32_t, dMultiBodyVehicle *>::iterator it = gVehicles.find(vehicleindex);
+    std::map<uint32_t, JoltBody *>::iterator it = gVehicles.find(vehicleindex);
     if(it == gVehicles.end())
 	{
         lua_pushnil(L);
@@ -120,11 +120,9 @@ int VehicleFinalize( lua_State *L )
 int VehicleRemove( lua_State *L ) {
 
     int index = lua_tonumber(L, 1);
-	std::map<uint32_t, dMultiBodyVehicle *>::iterator it = gVehicles.find(index);
+    std::map<uint32_t, JoltBody *>::iterator it = gVehicles.find(index);
     if(it != gVehicles.end())
 	{
-        gManager->RemoveRoot(it->second);
-        delete it->second;
         lua_pushnumber(L, 1);
     } else {
         printf("[Newton] Vehicle index %d not found.\n", index);

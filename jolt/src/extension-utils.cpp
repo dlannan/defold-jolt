@@ -7,7 +7,7 @@ uint32_t GetId() {
     return idctr++; //(uint32_t)(dmTime::GetTime() & 0xffffffff);
 }
 
-int SetTableVector( lua_State *L, dFloat *data, const char *name )
+int SetTableVector( lua_State *L, float *data, const char *name )
 {
     lua_pushstring(L, name); 
     lua_newtable(L);
@@ -62,10 +62,10 @@ void AddTableVertices( lua_State *L, int count, const double *vertices )
 }
 
 
-void AddTableUVs( lua_State *L, int count, const dFloat *uvs )
+void AddTableUVs( lua_State *L, int count, const float *uvs )
 {
     lua_newtable(L);
-    dFloat * uvsptr = (dFloat *)uvs;
+    float * uvsptr = (float *)uvs;
     for (int i=1; i<=count; ++i) {
         lua_pushnumber(L, i); 
         lua_pushnumber(L, *uvsptr++);
@@ -73,10 +73,10 @@ void AddTableUVs( lua_State *L, int count, const dFloat *uvs )
     }
 }
 
-void AddTableNormals( lua_State *L, int count, const dFloat *normals )
+void AddTableNormals( lua_State *L, int count, const float *normals )
 {
     lua_newtable(L);
-    dFloat * normptr = (dFloat *)normals;
+    float * normptr = (float *)normals;
     for (int i=1; i<=count; ++i) {
         lua_pushnumber(L, i); 
         lua_pushnumber(L, *normptr++);

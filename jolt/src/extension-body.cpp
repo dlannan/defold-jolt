@@ -23,83 +23,32 @@ struct UserData {
     //mydata->bodyID, NewtonBodyGetSleepState(body), pos[0], pos[1], pos[2]);
 // }
 
-
- int addBody( lua_State *L ) {
-
-    // Neutral transform matrix.
-    float	tm[16] = {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-
-    uint32_t idx = lua_tonumber(L, 1);
-    double x = lua_tonumber(L, 2);
-    double y = lua_tonumber(L, 3);
-    double z = lua_tonumber(L, 4);
-    double mass = lua_tonumber(L, 5);
-
-//     tm[12] = x; tm[13] = y; tm[14] = z;
-//     // NewtonBody *body = NewtonCreateDynamicBody(gWorld, gColls[idx], tm);
-//     JPH_BodyID body = JPH_BodyInterface_CreateAndAddBody();
-// 
-//     gBodies[idx] = body;
-// 
-//     // NewtonBodySetForceAndTorqueCallback(body, cb_applyForce);
-// 
-//     // Assign non-zero mass to sphere to make it dynamic.
-//     NewtonBodySetMassMatrix(body, mass, 1, 1, 1);
-//     
-//     UserData *myData = new UserData[2];
-//     myData[0].bodyID = idx;
-//     NewtonBodySetUserData(body, (void *)&myData[0]);
-    
-    lua_pushnumber(L, idx);
-    return 1;
-}
-
- int bodyGetMass( lua_State *L )
+int bodyGetMass( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 2);
-	std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+	std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }
     
-    float mass = 0.0f;
-    float Ixx = 0.0f;
-    float Iyy = 0.0f;
-    float Izz = 0.0f;
-    // NewtonBodyGetMass( gBodies[bodyindex], &mass, &Ixx, &Iyy, &Izz);
-    lua_pushnumber(L, mass );
-    lua_pushnumber(L, Ixx );
-    lua_pushnumber(L, Iyy );
-    lua_pushnumber(L, Izz );
-    return 4;
+    lua_pushnumber(L, bodyit->second->mass );
+    return 1;
 }
 
 int bodySetMassProperties( lua_State *L )
 {
-    uint32_t collindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JoltCollision>::iterator collit = gColls.find(collindex);
-    if(collit == gColls.end())
-	{
-        lua_pushnil(L);
-        return 1;
-    }
-    uint32_t bodyindex = lua_tonumber(L, 2);
-	std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    uint32_t bodyindex = lua_tonumber(L, 1);
+	std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end())
     {
         lua_pushnil(L);
         return 1;
     }
 
-    float mass = lua_tonumber(L, 3);
-
-    // NewtonBodySetMassProperties( bodyit->second, mass, collit->second );
+    float mass = lua_tonumber(L, 2);
+    bodyit->second->mass = mass;
+    
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -107,78 +56,91 @@ int bodySetMassProperties( lua_State *L )
 int bodyGetUserData( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end())
     {
         lua_pushnil(L);
         return 1;
     }
 
-    // int *tablerefptr = NewtonBodyGetUserData(gBodies[bodyindex]);
-    //lua_rawgeti(L, LUA_REGISTRYINDEX, bodyUserData[bodyindex]);
+    uint32_t udata = (uint32_t)bodyit->second->body->GetUserData();
+    lua_pushnumber(L, udata);
     return 1;
 }
 
 int bodySetUserData( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }
+    uint32_t udata = lua_tonumber(L, 2);
+    bodyit->second->body->SetUserData((uint64_t)udata);
 
-    // Grab the ref to the table passed in as the second arg
-//    int tableref = luaL_ref(L, LUA_REGISTRYINDEX);
-//     std::pair<uint32_t, int> tuple(bodyindex, tableref);
-//     bodyUserData.insert(tuple);
-// 
-    //NewtonBodySetUserData(gBodies[bodyindex], &tuple.second());
     lua_pushnumber(L, 1);
     return 1;
 }
 
-int bodySetLinearDamping( lua_State *L )
+int bodySetRestitution( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }    
-    float damping = lua_tonumber(L, 2);
-    // NewtonBodySetLinearDamping( gBodies[bodyindex], damping );
+    float restitution = lua_tonumber(L, 2);
+    JPH_Body_SetRestitution( gBodies[bodyindex]->body, restitution );
     lua_pushnumber(L, 1);
     return 1;
 }
 
-int bodySetAngularDamping( lua_State *L )
+int bodySetFriction( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }    
-    float damping[4] = { (float)lua_tonumber(L, 2), (float)lua_tonumber(L, 3), (float)lua_tonumber(L, 4), (float)lua_tonumber(L, 5) };
-    //NewtonBodySetAngularDamping( gBodies[bodyindex], (float *)&damping );
+    float friction = (float)lua_tonumber(L, 2);
+    JPH_Body_SetFriction( gBodies[bodyindex]->body, friction );
     lua_pushnumber(L, 1);
     return 1;
 }
 
-int bodySetMassMatrix( lua_State *L )
+int bodySetLinearVelocity( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }    
-    float mass = (float)lua_tonumber(L, 2);
-    float Ixx = (float)lua_tonumber(L, 3);
-    float Iyy = (float)lua_tonumber(L, 4);
-    float Izz = (float)lua_tonumber(L, 5);
-    //NewtonBodySetMassMatrix( gBodies[bodyindex],  mass, Ixx, Iyy, Izz );
+    float Ixx = (float)lua_tonumber(L, 2);
+    float Iyy = (float)lua_tonumber(L, 3);
+    float Izz = (float)lua_tonumber(L, 4);
+    JPH_Vec3 velocity[] = {Ixx, Iyy, Izz};
+    JPH_Body_SetLinearVelocity( gBodies[bodyindex]->body,  velocity );
+    lua_pushnumber(L, 1);
+    return 1;
+}
+
+int bodySetAngularVelocity( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    }    
+    float Ixx = (float)lua_tonumber(L, 2);
+    float Iyy = (float)lua_tonumber(L, 3);
+    float Izz = (float)lua_tonumber(L, 4);
+    JPH_Vec3 velocity[] = {Ixx, Iyy, Izz};
+    JPH_Body_SetAngularVelocity( gBodies[bodyindex]->body,  velocity );
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -186,25 +148,163 @@ int bodySetMassMatrix( lua_State *L )
 int bodyGetCentreOfMass( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }   
     float center[3];
-   // NewtonBodyGetCentreOfMass( gBodies[bodyindex], center);
+    RVec3 center = bodyit->second->GetCenterOfMassPosition();
 
-    lua_pushnumber(L, center[0]);
-    lua_pushnumber(L, center[1]);
-    lua_pushnumber(L, center[2]);
+    lua_pushnumber(L, center.x);
+    lua_pushnumber(L, center.y);
+    lua_pushnumber(L, center.z);
     return 3;
 }
 
-void __applyForceAndTorqueCallback(const JPH_BodyID body, float timestep, int threadIndex) 
+int bodyIsActive( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    } 
+    lua_pushnumber(L, JPH_Body_IsActive(bodyit->second->body));
+    return 1;
+}
+
+int bodyIsStatic( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    } 
+    lua_pushnumber(L, JPH_Body_IsStatic(bodyit->second->body));
+    return 1;
+}
+
+int bodyIsKinematic( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    } 
+    lua_pushnumber(L, JPH_Body_IsKinematic(bodyit->second->body));
+    return 1;
+}
+
+int bodyIsDynamic( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    } 
+    lua_pushnumber(L, JPH_Body_IsDynamic(bodyit->second->body));
+    return 1;
+}
+
+int bodyIsSensor( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    } 
+    lua_pushnumber(L, JPH_Body_IsSensor(bodyit->second->body));
+    return 1;
+}
+
+// TODO - Extract verts from shape!
+int bodyGetShape( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    }
+    Shape * shape = bodyit->second->body->GetShape();
+    lua_pushnumber(L, 1);
+    return 1;
+}
+
+int bodyGetPosition( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    }
+    RVec3 pos = bodyit->second->body->GetPosition();
+    lua_pushnumber(L, pos.x);
+    lua_pushnumber(L, pos.y);
+    lua_pushnumber(L, pos.z);
+    return 3;
+}
+
+int bodyGetRotation( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    }
+    Quat rot = bodyit->second->body->GetRotation();
+    lua_pushnumber(L, rot.x);
+    lua_pushnumber(L, rot.y);
+    lua_pushnumber(L, rot.z);
+    lua_pushnumber(L, rot.w);
+    return 4;
+}
+
+int bodySetPosition( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    }
+    float x = (float)lua_toumber(L, 2);
+    float y = (float)lua_tonumber(L, 3);
+    float z = (float)lua_tonumber(L, 4);
+    bodyit->second->body->SetPosition(RVec3(x, y, z));
+    lua_pushnumber(L, 1);
+    return 1;
+}
+
+int bodySetRotation( lua_State *L )
+{
+    uint32_t bodyindex = lua_tonumber(L, 1);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
+    if(bodyit == gBodies.end()) {
+        lua_pushnil(L);
+        return 1;
+    }
+    float x = (float)lua_toumber(L, 2);
+    float y = (float)lua_tonumber(L, 3);
+    float z = (float)lua_tonumber(L, 4);
+    float w = (float)lua_tonumber(L, 5);
+    bodyit->second->body->SetRotation( Quat(x, y, z, w) );
+    lua_pushnumber(L, 1);
+    return 1;
+}
+
+void __applyForceAndTorqueCallback(const JoltBody *body, float timestep, int threadIndex) 
 {
     uint32_t bodyindex = 0;
 
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit;
+    std::map<uint32_t, JoltBody *>::iterator bodyit;
     for( bodyit = gBodies.begin(); bodyit != gBodies.end(); ++bodyit ) {
         if(bodyit->second == body) {
             bodyindex = bodyit->first;
@@ -232,7 +332,7 @@ void __applyForceAndTorqueCallback(const JPH_BodyID body, float timestep, int th
 int bodySetForceAndTorqueCallback( lua_State *L )
 {
     uint32_t bodyindex = lua_tonumber(L, 1);
-    std::map<uint32_t, JPH_BodyID>::iterator bodyit = gBodies.find(bodyindex);
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.find(bodyindex);
     if(bodyit == gBodies.end()) {
         lua_pushnil(L);
         return 1;

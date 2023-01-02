@@ -10,7 +10,6 @@
 #define _EXTENSION_JOLT_BODY_HEADER_
 
 // External Body
-extern int addBody( lua_State *L );
 extern int bodyGetMass( lua_State *L );
 extern int bodySetMassProperties( lua_State *L );
 extern int bodyGetUserData( lua_State *L );

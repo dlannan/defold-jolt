@@ -10,22 +10,21 @@
 #include <vector>
 #include <map>
 
-#include <extension.h>
+#include "extension.h"
 
 JPH_PhysicsSystem* gWorld = NULL;
 JPH_BodyInterface* gInterface = NULL;
 
-std::map<uint32_t, JPH_BodyID >     gBodies;
-std::map<uint32_t, JoltCollision>   gColls;
+std::map<uint32_t, JoltBody* >      gBodies;
 std::map<uint32_t, JoltMesh* >      gMeshes;
 
 std::map<uint32_t, int>             bodyUserData;
-std::map<JoltBody* , int>           bodyCallback;
+std::map<JoltBody *, int>           bodyCallback;
 
 lua_State *gCbL = NULL;
 
 // utils
-int SetTableVector( lua_State *L, dFloat *data, const char *name );
+int SetTableVector( lua_State *L, float *data, const char *name );
 void CollisionShutdown();
 void BodyShutdown();
 
@@ -37,18 +36,18 @@ static int Create( lua_State *L )
     Close();
 
     // Print the library version.
-    printf("[Jolt] Version %d\n", JoltWorldGetVersion());
+    printf("[Jolt] Initialized.\n");
 
     JPH_Init();
 
     // Create the Jolt world.
     gWorld = JPH_PhysicsSystem_Create();
-    using BPLayerInterfaceImpl broadPhaseLayer = new();
+//    BPLayerInterfaceImpl broadPhaseLayer = new();
 
-    JPH_PhysicsSystem_Init(gWorld, maxBodies, numBodyMutexes, maxBodyPairs, maxConstraints, layer, layerFilter, pairFilter);
+//    JPH_PhysicsSystem_Init(gWorld, maxBodies, numBodyMutexes, maxBodyPairs, maxConstraints, layer, layerFilter, pairFilter);
     gInterface = JPH_PhysicsSystem_GetBodyInterface(gWorld);
 
-    VehiclesInit();
+//    VehiclesInit();
     return 0;
 }
 
@@ -59,21 +58,21 @@ static int Update( lua_State *L )
     // Callbacks use this state to run in - not sure how good/bad/crazy this is
     gCbL = L;
 
-    if(gWorld) JoltUpdate(gWorld, (float)timestep);
+    if(gWorld) JPH_PhysicsSystem_Update(gWorld, (float)timestep, 100, 2, NULL, NULL);
 
     lua_newtable(L);
     
-    std::map<uint32_t, JoltBody*>::iterator bodyit = gBodies.begin();
+    std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.begin();
     for ( ; bodyit != gBodies.end(); ++bodyit ) 
     {       
-        JoltBody *body = bodyit->second;
+        JoltBody * body = bodyit->second;
 
         // After update, build the table and set all the pos and quats.
-        dFloat rot[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        JoltBodyGetRotation(body, rot);
+        float rot[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        body->GetRotation(rot);
 
-        dFloat pos[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        JoltBodyGetPosition(body, pos);
+        float pos[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        body->GetPosition(pos);
 
         lua_pushnumber(L, bodyit->first); 
         lua_newtable(L);
@@ -92,18 +91,18 @@ void Close( void )
     // std::map<uint32_t, JoltMesh*>::iterator meshit = gMeshes.begin();
     // for ( ; meshit != gMeshes.end(); ++meshit )
     //     JoltMeshDestroy(meshit->second);
-    // std::map<uint32_t, JoltCollision>::iterator collit = gColls.begin();
-    // for ( ; collit != gColls.end(); ++collit )
+    // std::map<uint32_t, JoltCollision>::iterator collit = gShapes.begin();
+    // for ( ; collit != gShapes.end(); ++collit )
     //     JoltDestroyCollision(collit->second);
     // std::map<uint32_t, JoltBody*>::iterator bodyit = gBodies.begin();
     // for ( ; bodyit != gBodies.end(); ++bodyit )        
     //     JoltDestroyBody(bodyit->second);
 
-    gColls.clear();
+    gShapes.clear();
     gBodies.clear();
     gMeshes.clear();
 
-    if(gWorld) JoltDestroy(gWorld);
+    if(gWorld) JPH_PhysicsSystem_Destroy(gWorld);
     gWorld = NULL;
 
     JPH_Shutdown();
@@ -116,28 +115,41 @@ static const luaL_reg Module_methods[] =
     {"create", Create}, 
     {"update", Update}, 
     
-    {"collision_addplane", addCollisionPlane },
-    {"collision_addcube", addCollisionCube },
-    {"collision_addsphere", addCollisionSphere },
-    {"collision_addcone", addCollisionCone },
-    {"collision_addcapsule", addCollisionCapsule },
-    {"collision_addcylinder", addCollisionCylinder },
-    {"collision_addchamfercylinder", addCollisionChamferCylinder },
-    {"collision_addconvexhull", addCollisionConvexHull },
-    {"collision_destroy", destroyCollision },
+    {"shape_addplane", addShapePlane },
+    {"shape_addcube", addShapeCube },
+    {"shape_addsphere", addShapeSphere },
+    {"shape_addcone", addShapeCone },
+    {"shape_addcapsule", addShapeCapsule },
+    {"shape_addcylinder", addShapeCylinder },
+    {"shape_addchamfercylinder", addShapeChamferCylinder },
+    {"shape_addconvexhull", addShapeConvexHull },
+    {"shape_destroy", destroyShape },
 
-    {"body_add", addBody },
     {"body_getmass", bodyGetMass },
     {"body_setmassproperties", bodySetMassProperties },
     {"body_getuserdata", bodyGetUserData },
     {"body_setuserdata", bodySetUserData },
-    {"body_setlineardamping", bodySetLinearDamping },
-    {"body_setangulardamping", bodySetAngularDamping },
-    {"body_setmassmatrix", bodySetMassMatrix },
+    {"body_setrestitution", bodySetRestitution },
+    {"body_setfriction", bodySetFriction },
+    {"body_setlinearvelocity", bodySetLinearVelocity },
+    {"body_setangularvelocity", bodySetAngularVelocity },
+
+    {"body_isactive", bodyIsActive },
+    {"body_isstatic", bodyIsStatic },
+    {"body_iskinematic", bodyIsKinematic },
+    {"body_isdynamic", bodyIsDynamic },
+    {"body_issensor", bodyIsSensor },
+
+    {"body_getshape", bodyGetShape },
+    {"body_getposition", bodyGetPosition },
+    {"body_getrotation", bodyGetRotation },
+    {"body_setposition", bodySetPosition },
+    {"body_setrotation", bodySetRotation },
+
     {"body_getcentreofmass", bodyGetCentreOfMass },
     {"body_setforceandtorquecallback", bodySetForceAndTorqueCallback },
 
-    {"createmeshfromcollision", createMeshFromCollision },
+    {"createmeshfromshape", createMeshFromShape },
 
     {"vehicle_add", VehicleAdd },
     {"vehicle_addtire", VehicleAddTire },
