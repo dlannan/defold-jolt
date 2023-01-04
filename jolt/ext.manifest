@@ -12,17 +12,17 @@ platforms:
             symbols: []
             libs: ["physics_null"]
             frameworks: []
-            linkFlags: []
+            linkFlags: [ ]
 
     x86_64-linux:
         context:
             defines: ["JPH_DOUBLE_PRECISION"]
-            flags: ["-stdlib=libc++", "-std=c++17"]
+            flags: ["-stdlib=libc++", "-std=c++11"]
             excludeLibs: ["physics","LinearMath","BulletDynamics","BulletCollision","Box2D"]
             excludeSymbols: []
             symbols: []
             libs: ["physics_null"]
-            linkFlags: []
+            linkFlags: [ ]
 
     js-web:
         context:
@@ -60,7 +60,7 @@ platforms:
             excludeSymbols: []
             symbols: []
             libs: ["libphysics_null.lib"]
-            linkFlags: []
+            linkFlags: [ "-lstdc++" ]
 
     armv7-android:
         context:
@@ -71,7 +71,7 @@ platforms:
             excludeSymbols: []
             symbols: []
             libs: ["physics_null"]
-            linkFlags: []
+            linkFlags: [ ]
             jetifier: true
 
     arm64-android:
@@ -83,7 +83,7 @@ platforms:
             excludeSymbols: []
             symbols: []
             libs: ["physics_null"]
-            linkFlags: []
+            linkFlags: [ ]
             jetifier: true
 
     armv7-ios:
@@ -95,7 +95,7 @@ platforms:
             symbols: []
             libs: ["physics_null"]
             frameworks: []
-            linkFlags: []
+            linkFlags: [ ]
 
     arm64-ios:
         context:
@@ -106,7 +106,7 @@ platforms:
             symbols: []
             libs: ["physics_null"]
             frameworks: []
-            linkFlags: []
+            linkFlags: [ ]
 
     x86_64-ios:
         context:
@@ -117,5 +117,4 @@ platforms:
             symbols: []
             libs: ["physics_null"]
             frameworks: []
-            linkFlags: []
-
+            linkFlags: [ ]

@@ -241,7 +241,7 @@ int bodyGetPosition( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-    JPH_Vec3 pos = JPH_Body_GetPosition(bodyit->second->body);
+    JPH_Vec3 pos = JPH_Body_GetPosition(gInterface, bodyit->second->id);
     lua_pushnumber(L, pos.x);
     lua_pushnumber(L, pos.y);
     lua_pushnumber(L, pos.z);
@@ -256,7 +256,7 @@ int bodyGetRotation( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-    JPH_Quat rot = JPH_Body_GetRotation(bodyit->second->body);
+    JPH_Quat rot = JPH_Body_GetRotation(gInterface, bodyit->second->id);
     lua_pushnumber(L, rot.x);
     lua_pushnumber(L, rot.y);
     lua_pushnumber(L, rot.z);
@@ -276,9 +276,9 @@ int bodySetPosition( lua_State *L )
     float y = (float)lua_tonumber(L, 3);
     float z = (float)lua_tonumber(L, 4);
 
-    JPH_Vec3    pos;
+    JPH_RVec3    pos;
     pos.x = x; pos.y = y; pos.z = z;
-    JPH_Body_SetPosition(bodyit->second->body, &pos);
+    JPH_Body_SetPosition(gInterface, bodyit->second->id, &pos);
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -297,7 +297,7 @@ int bodySetRotation( lua_State *L )
     float w = (float)lua_tonumber(L, 5);
     JPH_Quat rot;
     rot.x = x; rot.y = y; rot.z = z; rot.w = w;
-    JPH_Body_SetRotation(bodyit->second->body, &rot);
+    JPH_Body_SetRotation(gInterface, bodyit->second->id, &rot);
     lua_pushnumber(L, 1);
     return 1;
 }

@@ -69,13 +69,13 @@ static int Update( lua_State *L )
     std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.begin();
     for ( ; bodyit != gBodies.end(); ++bodyit ) 
     {       
-        JPH_Body * body = bodyit->second->body;
+        JoltBody * body = bodyit->second;
 
         // After update, build the table and set all the pos and quats.
-        JPH_Quat jrot = JPH_Body_GetRotation(body);
+        JPH_Quat jrot = JPH_Body_GetRotation(gInterface, body->id);
         float rot[4] = {jrot.x, jrot.y, jrot.z, jrot.w};
         
-        JPH_Vec3 jpos = JPH_Body_GetPosition(body);
+        JPH_Vec3 jpos = JPH_Body_GetPosition(gInterface, body->id);
         float pos[4] = {jpos.x, jpos.y, jpos.z, 0.0f};
         
         lua_pushnumber(L, bodyit->first); 

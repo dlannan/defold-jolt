@@ -91,12 +91,12 @@ static JPH::Quat ToQuat(const JPH_Quat* quat)
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
 }
 
-static void FromQuat(const JPH_Quat& quat, JPH_Quat* result)
+static void FromQuat(const JPH::Quat& quat, JPH_Quat* result)
 {
-    result->x = quat.x;
-    result->y = quat.y;
-    result->z = quat.z;
-    result->w = quat.w;
+    result->x = quat.GetX();
+    result->y = quat.GetY();
+    result->z = quat.GetZ();
+    result->w = quat.GetW();
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle* triangle)
@@ -432,36 +432,36 @@ JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create()
 
 JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(
     JPH_ShapeSettings* shapeSettings,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer)
 {
     JPH::ShapeSettings* joltShapeSettings = reinterpret_cast<JPH::ShapeSettings*>(shapeSettings);
     auto bodyCreationSettings = new JPH::BodyCreationSettings(
-        joltShapeSettings,
-        ToVec3(position),
+        (const ShapeSettings *)joltShapeSettings,
+        ToRVec3(position),
         ToQuat(rotation),
         (JPH::EMotionType)motionType,
-        objectLayer
+        (ObjectLayer)objectLayer
     );
     return reinterpret_cast<JPH_BodyCreationSettings*>(bodyCreationSettings);
 }
 
 JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(
     JPH_Shape* shape,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer)
 {
     JPH::Shape* joltShape = reinterpret_cast<JPH::Shape*>(shape);
     auto bodyCreationSettings = new JPH::BodyCreationSettings(
-        joltShape,
-        ToVec3(position),
+        (const Shape *)joltShape,
+        ToRVec3(position),
         ToQuat(rotation),
         (JPH::EMotionType)motionType,
-        objectLayer
+        (ObjectLayer)objectLayer
     );
     return reinterpret_cast<JPH_BodyCreationSettings*>(bodyCreationSettings);
 }
@@ -788,34 +788,40 @@ JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
 
 JPH_Shape *JPH_Body_GetShape(const JPH_Body* body)
 {
-    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
-    return joltBody->GetShape();
+    auto shape = reinterpret_cast<const JPH::Body*>(body)->GetShape();
+    return (JPH_Shape *)(shape);
 }
 
-JPH_Vec3 JPH_Body_GetPosition(JPH_Body* body)
+JPH_Vec3 JPH_Body_GetPosition(JPH_BodyInterface* interface, JPH_BodyID bodyID)
 {
     JPH_Vec3 output;
-    auto posVec = reinterpret_cast<const JPH::Body*>(body)->GetPosition();
-    FromVec3(posVec, &output);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    auto posVec =joltBodyInterface->GetPosition(JPH::BodyID(bodyID));
+    output.x = posVec.GetX();
+    output.y = posVec.GetY();
+    output.z = posVec.GetZ();
     return output;
 }
 
-void JPH_Body_SetPosition(JPH_Body* body, const JPH_Vec3* position)
+void JPH_Body_SetPosition(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_RVec3* position)
 {
-    reinterpret_cast<const JPH::Body*>(body)->SetPosition(position);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    joltBodyInterface->SetPosition(JPH::BodyID(bodyID), ToRVec3(position), (JPH::EActivation)11);
 }
 
-JPH_Quat JPH_Body_GetRotation(JPH_Body* body)
+JPH_Quat JPH_Body_GetRotation(JPH_BodyInterface* interface, JPH_BodyID bodyID)
 {
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
     JPH_Quat output;
-    auto rotQuat = reinterpret_cast<const JPH::Body*>(body)->GetRotation();
+    JPH::Quat rotQuat = joltBodyInterface->GetRotation(JPH::BodyID(bodyID));
     FromQuat(rotQuat, &output);
     return output;
 }
 
-void JPH_Body_SetPosition(JPH_Body* body, const JPH_Quat* rotation)
+void JPH_Body_SetRotation(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_Quat* rotation)
 {
-    reinterpret_cast<const JPH::Body*>(body)->SetRotation(rotation);
+    auto joltBodyInterface = reinterpret_cast<JPH::BodyInterface*>(interface);
+    joltBodyInterface->SetRotation(JPH::BodyID(bodyID), ToQuat(rotation), (JPH::EActivation)1);
 }
 
 uint32_t JPH_Body_GetUserData(JPH_Body* body)
@@ -826,14 +832,16 @@ uint32_t JPH_Body_GetUserData(JPH_Body* body)
 
 void JPH_Body_SetUserData(JPH_Body* body, uint32_t data)
 {
-    reinterpret_cast<const JPH::Body*>(body)->SetUserData((uint64_t)data);
+    ((JPH::Body*)body)->SetUserData((uint64_t)data);
 }
 
 JPH_Vec3 JPH_Body_GetCenterOfMassPosition(JPH_Body* body)
 {
     JPH_Vec3 output;
-    auto posVec = reinterpret_cast<const JPH::Body*>(body)->GetCenterOfMassPosition();
-    FromVec3(posVec, &output);
+    auto posVec = (reinterpret_cast<const JPH::Body*>(body))->GetCenterOfMassPosition();
+    output.x = posVec.GetX();
+    output.y = posVec.GetY();
+    output.z = posVec.GetZ();
     return output;
 }
 

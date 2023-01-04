@@ -221,12 +221,12 @@ JPH_CAPI void JPH_Shape_Destroy(JPH_Shape* shape);
 /* JPH_BodyCreationSettings */
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create();
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create2(JPH_ShapeSettings* settings,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer);
 JPH_CAPI JPH_BodyCreationSettings* JPH_BodyCreationSettings_Create3(JPH_Shape* shape,
-    const JPH_Vec3* position,
+    const JPH_RVec3* position,
     const JPH_Quat* rotation,
     JPH_MotionType motionType,
     JPH_ObjectLayer objectLayer);
@@ -255,6 +255,12 @@ JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* 
 JPH_CAPI uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system);
 
 /* BodyInterface */
+
+JPH_CAPI JPH_Vec3 JPH_Body_GetPosition(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_Body_SetPosition(JPH_BodyInterface* _interface, JPH_BodyID bodyID, const JPH_RVec3* position);
+JPH_CAPI JPH_Quat JPH_Body_GetRotation(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_Body_SetRotation(JPH_BodyInterface* _interface, JPH_BodyID bodyID, const JPH_Quat* rotation);
+
 JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
 JPH_CAPI JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* _interface, JPH_BodyCreationSettings* settings, JPH_ActivationMode activation);
 JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* _interface, JPH_BodyCreationSettings* settings);
@@ -310,10 +316,6 @@ JPH_CAPI void JPH_Body_AddImpulse(JPH_Body* body, const JPH_Vec3* impulse);
 JPH_CAPI void JPH_Body_AddImpulseAtPosition(JPH_Body* body, const JPH_Vec3* impulse, const JPH_RVec3* position);
 JPH_CAPI void JPH_Body_AddAngularImpulse(JPH_Body* body, const JPH_Vec3* angularImpulse);
 
-JPH_CAPI JPH_Vec3 JPH_Body_GetPosition(JPH_Body* body);
-JPH_CAPI void JPH_Body_SetPosition(JPH_Body* body, const JPH_Vec3* position);
-JPH_CAPI JPH_Quat JPH_Body_GetRotation(JPH_Body* body);
-JPH_CAPI void JPH_Body_SetRotation(JPH_Body* body, const JPH_Quat* rotation);
 JPH_CAPI uint32_t JPH_Body_GetUserData(JPH_Body* body);
 JPH_CAPI void JPH_Body_SetUserData(JPH_Body* body, uint32_t data);
 JPH_CAPI JPH_Vec3 JPH_Body_GetCenterOfMassPosition(JPH_Body* body);
