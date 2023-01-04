@@ -1,6 +1,7 @@
 #include "extension.h"
 #include "extension-body.h"
 
+#include <joltc.h>
 
 // Define a custom data structure to store a body ID.
 struct UserData {
@@ -62,8 +63,7 @@ int bodyGetUserData( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-
-    uint32_t udata = (uint32_t)bodyit->second->body->GetUserData();
+    uint32_t udata = JPH_Body_GetUserData(bodyit->second->body);
     lua_pushnumber(L, udata);
     return 1;
 }
@@ -77,8 +77,7 @@ int bodySetUserData( lua_State *L )
         return 1;
     }
     uint32_t udata = lua_tonumber(L, 2);
-    bodyit->second->body->SetUserData((uint64_t)udata);
-
+    JPH_Body_SetUserData(bodyit->second->body, udata);
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -122,8 +121,8 @@ int bodySetLinearVelocity( lua_State *L )
     float Ixx = (float)lua_tonumber(L, 2);
     float Iyy = (float)lua_tonumber(L, 3);
     float Izz = (float)lua_tonumber(L, 4);
-    JPH_Vec3 velocity[] = {Ixx, Iyy, Izz};
-    JPH_Body_SetLinearVelocity( gBodies[bodyindex]->body,  velocity );
+    JPH_Vec3 velocity = {Ixx, Iyy, Izz};
+    JPH_Body_SetLinearVelocity( gBodies[bodyindex]->body,  &velocity );
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -139,8 +138,8 @@ int bodySetAngularVelocity( lua_State *L )
     float Ixx = (float)lua_tonumber(L, 2);
     float Iyy = (float)lua_tonumber(L, 3);
     float Izz = (float)lua_tonumber(L, 4);
-    JPH_Vec3 velocity[] = {Ixx, Iyy, Izz};
-    JPH_Body_SetAngularVelocity( gBodies[bodyindex]->body,  velocity );
+    JPH_Vec3 velocity = {Ixx, Iyy, Izz};
+    JPH_Body_SetAngularVelocity( gBodies[bodyindex]->body,  &velocity );
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -153,9 +152,7 @@ int bodyGetCentreOfMass( lua_State *L )
         lua_pushnil(L);
         return 1;
     }   
-    float center[3];
-    RVec3 center = bodyit->second->GetCenterOfMassPosition();
-
+    JPH_Vec3 center = JPH_Body_GetCenterOfMassPosition(bodyit->second->body);
     lua_pushnumber(L, center.x);
     lua_pushnumber(L, center.y);
     lua_pushnumber(L, center.z);
@@ -231,7 +228,7 @@ int bodyGetShape( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-    Shape * shape = bodyit->second->body->GetShape();
+    bodyit->second->shape = JPH_Body_GetShape(bodyit->second->body);
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -244,7 +241,7 @@ int bodyGetPosition( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-    RVec3 pos = bodyit->second->body->GetPosition();
+    JPH_Vec3 pos = JPH_Body_GetPosition(bodyit->second->body);
     lua_pushnumber(L, pos.x);
     lua_pushnumber(L, pos.y);
     lua_pushnumber(L, pos.z);
@@ -259,7 +256,7 @@ int bodyGetRotation( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-    Quat rot = bodyit->second->body->GetRotation();
+    JPH_Quat rot = JPH_Body_GetRotation(bodyit->second->body);
     lua_pushnumber(L, rot.x);
     lua_pushnumber(L, rot.y);
     lua_pushnumber(L, rot.z);
@@ -275,10 +272,13 @@ int bodySetPosition( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-    float x = (float)lua_toumber(L, 2);
+    float x = (float)lua_tonumber(L, 2);
     float y = (float)lua_tonumber(L, 3);
     float z = (float)lua_tonumber(L, 4);
-    bodyit->second->body->SetPosition(RVec3(x, y, z));
+
+    JPH_Vec3    pos;
+    pos.x = x; pos.y = y; pos.z = z;
+    JPH_Body_SetPosition(bodyit->second->body, &pos);
     lua_pushnumber(L, 1);
     return 1;
 }
@@ -291,11 +291,13 @@ int bodySetRotation( lua_State *L )
         lua_pushnil(L);
         return 1;
     }
-    float x = (float)lua_toumber(L, 2);
+    float x = (float)lua_tonumber(L, 2);
     float y = (float)lua_tonumber(L, 3);
     float z = (float)lua_tonumber(L, 4);
     float w = (float)lua_tonumber(L, 5);
-    bodyit->second->body->SetRotation( Quat(x, y, z, w) );
+    JPH_Quat rot;
+    rot.x = x; rot.y = y; rot.z = z; rot.w = w;
+    JPH_Body_SetRotation(bodyit->second->body, &rot);
     lua_pushnumber(L, 1);
     return 1;
 }

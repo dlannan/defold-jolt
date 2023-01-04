@@ -1,4 +1,4 @@
-// Copyright © Amer Koleci and Contributors.
+// Copyright ï¿½ Amer Koleci and Contributors.
 // Licensed under the MIT License (MIT). See LICENSE in the repository root for more information.
 
 #include "joltc.h"
@@ -89,6 +89,14 @@ static void FromRVec3(const JPH::RVec3& vec, JPH_RVec3* result)
 static JPH::Quat ToQuat(const JPH_Quat* quat)
 {
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
+}
+
+static JPH_Quat FromQuat(const JP::Quat& quat, JPH_Quat* oresultquat)
+{
+    result->x = quat.x;
+    result->y = quat.y;
+    result->z = quat.z;
+    result->w = quat.w;
 }
 
 static JPH::Triangle ToTriangle(const JPH_Triangle* triangle)
@@ -285,6 +293,7 @@ JPH_SphereShape* JPH_SphereShape_Create(float radius)
     auto shape = new JPH::SphereShape(radius);
     return reinterpret_cast<JPH_SphereShape*>(shape);
 }
+
 
 float JPH_SphereShape_GetRadius(const JPH_SphereShape* shape)
 {
@@ -775,6 +784,62 @@ JPH_BodyID JPH_Body_GetID(const JPH_Body* body)
 {
     auto joltBody = reinterpret_cast<const JPH::Body*>(body);
     return joltBody->GetID().GetIndexAndSequenceNumber();
+}
+
+JPH_Shape *JPH_Body_GetShape(const JPH_Body* body)
+{
+    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
+    return joltBody->GetShape();
+}
+
+
+
+JPH_Vec3 JPH_Body_GetPosition(JPH_Body* body)
+{
+    JPH_Vec3 output;
+    auto posVec = reinterpret_cast<const JPH::Body*>(body)->GetPosition();
+    FromVec3(posVec, &output);
+    return output;
+}
+
+void JPH_Body_SetPosition(JPH_Body* body, const JPH_Vec3* position)
+{
+    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
+    joltBody->SetPosition(position);
+}
+
+JPH_Quat JPH_Body_GetRotation(JPH_Body* body)
+{
+    JPH_Quat output;
+    auto rotQuat = reinterpret_cast<const JPH::Body*>(body)->GetRotation();
+    FromQuat(rotQuat, &output);
+    return output;
+}
+
+void JPH_Body_SetPosition(JPH_Body* body, const JPH_Quat* rotation)
+{
+    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
+    joltBody->SetRotation(rotation);
+}
+
+uint32_t JPH_Body_GetUserData(JPH_Body* body)
+{
+    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
+    return (uint32_t)joltBody->GetUserData();
+}
+
+void JPH_Body_SetUserData(JPH_Body* body, uint32_t data)
+{
+    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
+    joltBody->SetUserData((uint64_t)data);
+}
+
+JPH_Vec3 JPH_Body_GetCenterOfMassPosition(JPH_Body* body)
+{
+    JPH_Vec3 output;
+    auto posVec = reinterpret_cast<const JPH::Body*>(body)->GetCenterOfMassPosition();
+    FromVec3(posVec, &output);
+    retrun output;
 }
 
 bool JPH_Body_IsActive(const JPH_Body* body)

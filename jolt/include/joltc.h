@@ -284,6 +284,7 @@ JPH_CAPI float JPH_BodyInterface_GetFriction(const JPH_BodyInterface* interface,
 JPH_CAPI void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_BodyID bodyID, float friction);
 
 /* Body */
+JPH_CAPI JPH_Shape *JPH_Body_GetShape(const JPH_Body* body);
 JPH_CAPI JPH_BodyID JPH_Body_GetID(const JPH_Body* body);
 JPH_CAPI bool JPH_Body_IsActive(const JPH_Body* body);
 JPH_CAPI bool JPH_Body_IsStatic(const JPH_Body* body);
@@ -308,6 +309,14 @@ JPH_CAPI void JPH_Body_GetAccumulatedTorque(JPH_Body* body, JPH_Vec3* force);
 JPH_CAPI void JPH_Body_AddImpulse(JPH_Body* body, const JPH_Vec3* impulse);
 JPH_CAPI void JPH_Body_AddImpulseAtPosition(JPH_Body* body, const JPH_Vec3* impulse, const JPH_RVec3* position);
 JPH_CAPI void JPH_Body_AddAngularImpulse(JPH_Body* body, const JPH_Vec3* angularImpulse);
+
+JPH_CAPI JPH_Vec3 JPH_Body_GetPosition(JPH_Body* body);
+JPH_CAPI void JPH_Body_SetPosition(JPH_Body* body, const JPH_Vec3* position);
+JPH_CAPI JPH_Quat JPH_Body_GetRotation(JPH_Body* body);
+JPH_CAPI void JPH_Body_SetRotation(JPH_Body* body, const JPH_Quat* rotation);
+JPH_CAPI uint32_t JPH_Body_GetUserData(JPH_Body* body);
+JPH_CAPI void JPH_Body_SetUserData(JPH_Body* body, uint32_t data);
+JPH_CAPI JPH_Vec3 JPH_Body_GetCenterOfMassPosition(JPH_Body* body);
 
 /* JPH_BroadPhaseLayer */
 typedef struct JPH_BroadPhaseLayerInterface_Procs {

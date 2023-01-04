@@ -1,6 +1,7 @@
 
 #include "extension.h"
-#include "extension-collision.h"
+
+#include <joltc.h>
 
 enum ShapeType {
 
@@ -16,14 +17,13 @@ enum ShapeType {
 
 int addShapeSphere( lua_State * L ) {
 
-    double radii = lua_tonumber(L, 1);
-	RefConst<Shape> sphere_shape = new SphereShape(radii);
-    RVec3 position(0.0f, 0.0f, 0.0f);
-    JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(sphere_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    float radii = (float)lua_tonumber(L, 1);
     uint32_t index = GetId();
+    JPH_SphereShapeSettings *sphere_shape = JPH_SphereShapeSettings_Create(radii);
+    JoltBody *newbody = new JoltBody();
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)sphere_shape);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     gBodies[index] = newbody;
     lua_pushnumber(L, index);
     return 1;
@@ -31,14 +31,16 @@ int addShapeSphere( lua_State * L ) {
 
  int addShapePlane( lua_State * L ) {
 
-    double width = lua_tonumber(L, 1);
-    double depth = lua_tonumber(L, 2);
-	RefConst<Shape> box_shape = new BoxShape(Vec3(width, 0.1f, depth));
-    RVec3 position(0.0f, 0.0f, 0.0f);
+    float width = (float)lua_tonumber(L, 1);
+    float depth = (float)lua_tonumber(L, 2);
+
+    JPH_Vec3 halfext = {width * 0.5f, 0.1f, depth * 0.5f};
+    float cradius = sqrt(width * width + depth * depth) * 0.5f;
+	JPH_BoxShapeSettings *box_shape =JPH_BoxShapeSettings_Create(&halfext, cradius);
     JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(box_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface,(JPH_BodyCreationSettings *) box_shape);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     uint32_t index = GetId();
     gBodies[index] = newbody;
     lua_pushnumber(L, index);
@@ -47,15 +49,17 @@ int addShapeSphere( lua_State * L ) {
 
 int addShapeCube( lua_State * L ) {
 
-    double sx = lua_tonumber(L, 1);
-    double sy = lua_tonumber(L, 2);
-    double sz = lua_tonumber(L, 3);
-	RefConst<Shape> box_shape = new BoxShape(Vec3(sx, sy, sz));
-    RVec3 position(0.0f, 0.0f, 0.0f);
+    float sx = (float)lua_tonumber(L, 1);
+    float sy = (float)lua_tonumber(L, 2);
+    float sz = (float)lua_tonumber(L, 3);
+
+    JPH_Vec3 halfext = {sx * 0.5f, sy * 0.5f, sz * 0.5f};
+    float cradius = sqrt(sx * sx + sy * sy + sz * sz) * 0.5f;
+	JPH_BoxShapeSettings *box_shape =JPH_BoxShapeSettings_Create(&halfext, cradius);
     JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(box_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)box_shape);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     uint32_t index = GetId();
     gBodies[index] = newbody;
     lua_pushnumber(L, index);
@@ -64,14 +68,13 @@ int addShapeCube( lua_State * L ) {
 
 int addShapeCone( lua_State * L ) {
 
-    double radius = lua_tonumber(L, 1);
-    double height = lua_tonumber(L, 2);
-	RefConst<Shape> cyl_shape = new CylinderShape(height/2, radius, 0.0f);
-    RVec3 position(0.0f, 0.0f, 0.0f);
+    float radius = (float)lua_tonumber(L, 1);
+    float height = (float)lua_tonumber(L, 2);
+    JPH_CylinderShapeSettings *settings = JPH_CylinderShapeSettings_Create(height/2.0f, radius, 0.0f);
     JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cyl_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)settings);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     uint32_t index = GetId();
     gBodies[index] = newbody;    
     lua_pushnumber(L, index);
@@ -80,14 +83,13 @@ int addShapeCone( lua_State * L ) {
 
 int addShapeCapsule( lua_State * L ) {
 
-    double r0 = lua_tonumber(L, 1);
-    double height = lua_tonumber(L, 3);
-	RefConst<Shape> cap_shape = new CapsuleShape(height/2, r0);
-    RVec3 position(0.0f, 0.0f, 0.0f);
+    float r0 = (float)lua_tonumber(L, 1);
+    float height = (float)lua_tonumber(L, 3);
+	JPH_CylinderShapeSettings *cap_shape = JPH_CapsuleShapeSettings_Create(height/2, r0);
     JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cap_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)cap_shape);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     uint32_t index = GetId();
     gBodies[index] = newbody;    
     lua_pushnumber(L, index);
@@ -96,15 +98,14 @@ int addShapeCapsule( lua_State * L ) {
 
 int addShapeCylinder( lua_State * L ) {
 
-    double r0 = lua_tonumber(L, 1);
-    double r1 = lua_tonumber(L, 2);
-    double height = lua_tonumber(L, 3);
-	RefConst<Shape> cyl_shape = new CylinderShape(height/2, r0, r1);
-    RVec3 position(0.0f, 0.0f, 0.0f);
+    float r0 = (float)lua_tonumber(L, 1);
+    float r1 = (float)lua_tonumber(L, 2);
+    float height = (float)lua_tonumber(L, 3);
+    JPH_CylinderShapeSettings *settings = JPH_CylinderShapeSettings_Create(height/2.0f, r0, r1);
     JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cyl_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)settings);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     uint32_t index = GetId();
     gBodies[index] = newbody;
     lua_pushnumber(L, index);
@@ -113,14 +114,13 @@ int addShapeCylinder( lua_State * L ) {
 
 int addShapeChamferCylinder( lua_State * L ) {
 
-    double radius = lua_tonumber(L, 1);
-    double height = lua_tonumber(L, 2);
-	RefConst<Shape> cyl_shape = new CylinderShape(height/2, radius);
-    RVec3 position(0.0f, 0.0f, 0.0f);
+    float radius = (float)lua_tonumber(L, 1);
+    float height = (float)lua_tonumber(L, 2);
+    JPH_CylinderShapeSettings *settings = JPH_CylinderShapeSettings_Create(height/2.0f, radius);
     JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(BodyCreationSettings(cyl_shape, position, Quat::sIdentity(), EMotionType::Dynamic, Layers::MOVING));
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)settings);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     uint32_t index = GetId();
     gBodies[index] = newbody;
     lua_pushnumber(L, index);
@@ -129,15 +129,15 @@ int addShapeChamferCylinder( lua_State * L ) {
 
 int addShapeConvexHull( lua_State * L ) {
 
-    double count = lua_tonumber(L, 1);
-    const Vec3 *vertCloud = (Vec3 *)lua_topointer(L, 2);
+    float maxRadius = (float)lua_tonumber(L, 1);
+    int count = lua_tonumber(L, 2);
+    const JPH_Vec3 *vertCloud = (JPH_Vec3 *)lua_topointer(L, 3);
 
-    ConvexHullShapeSettings settings(vertCloud, count);
-   	RefConst<Shape> convhull_shape = new ConvexHullShape(settings);
+    ConvexHullShapeSettings *settings = JPH_ConvexHullShapeSettings_Create(vertCloud, count, maxRadius);
     JoltBody *newbody = new JoltBody();
-    newbody->body = mBodyInterface->CreateBody(convhull_shape);
-    newbody->id = = JPH_Body_GetID(newbody->body);
-    gInterface->AddBody(newbody->body.id, EActivation::DontActivate);
+    newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)settings);
+    newbody->id = JPH_Body_GetID(newbody->body);
+    JPH_BodyInterface_AddBody(gInterface, newbody->id, JPH_ACTIVATION_MODE_DONT_ACTIVATE);
     uint32_t index = GetId();
     gBodies[index] = newbody;
     lua_pushnumber(L, index);

@@ -1,13 +1,13 @@
 
 
+#ifndef _EXTENSION_JOLT_HEADER_
+#define _EXTENSION_JOLT_HEADER_
+
 // include the Defold SDK
 #include <dmsdk/sdk.h>
 #include <stdlib.h>
 #include <vector>
 #include <map>
-
-#ifndef _EXTENSION_JOLT_HEADER_
-#define _EXTENSION_JOLT_HEADER_
 
 #include <joltc.h>
 
@@ -16,7 +16,8 @@ extern JPH_BodyInterface* gInterface;
 
 typedef struct JoltBody {
     JPH_BodyID  id;
-    Body *      body;
+    JPH_Body *  body;
+    JPH_Shape * shape;
     float       mass;
 } JoltBody;
 
@@ -25,7 +26,7 @@ typedef struct JoltMesh {
     uint32_t        count;
 } JoltMesh;
 
-extern std::map<uint32_t, JoltBolt* >      gBodies;
+extern std::map<uint32_t, JoltBody* >      gBodies;
 extern std::map<uint32_t, JoltMesh* >      gMeshes;
 
 //extern std::map<uint32_t, int>   bodyUserData;

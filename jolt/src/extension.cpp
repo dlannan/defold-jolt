@@ -11,6 +11,7 @@
 #include <map>
 
 #include "extension.h"
+#include "extension-shape.h"
 
 JPH_PhysicsSystem* gWorld = NULL;
 JPH_BodyInterface* gInterface = NULL;
@@ -65,15 +66,15 @@ static int Update( lua_State *L )
     std::map<uint32_t, JoltBody *>::iterator bodyit = gBodies.begin();
     for ( ; bodyit != gBodies.end(); ++bodyit ) 
     {       
-        JoltBody * body = bodyit->second;
+        JPH_Body * body = bodyit->second->body;
 
         // After update, build the table and set all the pos and quats.
-        float rot[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        body->GetRotation(rot);
-
-        float pos[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        body->GetPosition(pos);
-
+        JPH_Quat jrot = JPH_Body_GetRotation(body);
+        float rot[4] = {jrot.x, jrot.y, jrot.z, jrot.w};
+        
+        JPH_Vec3 jpos = JPH_Body_GetPosition(body, pos);
+        float pos[4] = {jpos.x, jpos.y, jpos.z, 0.0f};
+        
         lua_pushnumber(L, bodyit->first); 
         lua_newtable(L);
         
@@ -98,7 +99,6 @@ void Close( void )
     // for ( ; bodyit != gBodies.end(); ++bodyit )        
     //     JoltDestroyBody(bodyit->second);
 
-    gShapes.clear();
     gBodies.clear();
     gMeshes.clear();
 
