@@ -255,33 +255,33 @@ JPH_CAPI uint32_t JPH_PhysicsSystem_GetNumActiveBodies(const JPH_PhysicsSystem* 
 JPH_CAPI uint32_t JPH_PhysicsSystem_GetMaxBodies(const JPH_PhysicsSystem* system);
 
 /* BodyInterface */
-JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings, JPH_ActivationMode activation);
-JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings);
-JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings);
-JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithoutID(JPH_BodyInterface* interface, JPH_BodyCreationSettings* settings);
-JPH_CAPI void JPH_BodyInterface_DestroyBodyWithoutID(JPH_BodyInterface* interface, JPH_Body* body);
-JPH_CAPI bool JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* interface, JPH_Body* body);
-JPH_CAPI bool JPH_BodyInterface_AssignBodyID2(JPH_BodyInterface* interface, JPH_Body* body, JPH_BodyID bodyID);
-JPH_CAPI JPH_Body* JPH_BodyInterface_UnassignBodyID(JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_DestroyBody(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI JPH_BodyID JPH_BodyInterface_CreateAndAddBody(JPH_BodyInterface* _interface, JPH_BodyCreationSettings* settings, JPH_ActivationMode activation);
+JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBody(JPH_BodyInterface* _interface, JPH_BodyCreationSettings* settings);
+JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithID(JPH_BodyInterface* _interface, JPH_BodyID bodyID, JPH_BodyCreationSettings* settings);
+JPH_CAPI JPH_Body* JPH_BodyInterface_CreateBodyWithoutID(JPH_BodyInterface* _interface, JPH_BodyCreationSettings* settings);
+JPH_CAPI void JPH_BodyInterface_DestroyBodyWithoutID(JPH_BodyInterface* _interface, JPH_Body* body);
+JPH_CAPI bool JPH_BodyInterface_AssignBodyID(JPH_BodyInterface* _interface, JPH_Body* body);
+JPH_CAPI bool JPH_BodyInterface_AssignBodyID2(JPH_BodyInterface* _interface, JPH_Body* body, JPH_BodyID bodyID);
+JPH_CAPI JPH_Body* JPH_BodyInterface_UnassignBodyID(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
 
-JPH_CAPI void JPH_BodyInterface_AddBody(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_ActivationMode activation);
-JPH_CAPI void JPH_BodyInterface_RemoveBody(JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI bool JPH_BodyInterface_IsActive(JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI bool JPH_BodyInterface_IsAdded(JPH_BodyInterface* interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_AddBody(JPH_BodyInterface* _interface, JPH_BodyID bodyID, JPH_ActivationMode activation);
+JPH_CAPI void JPH_BodyInterface_RemoveBody(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI bool JPH_BodyInterface_IsActive(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI bool JPH_BodyInterface_IsAdded(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
 
-JPH_CAPI void JPH_BodyInterface_SetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, const JPH_Vec3* velocity);
-JPH_CAPI void JPH_BodyInterface_GetLinearVelocity(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_Vec3* velocity);
-JPH_CAPI void JPH_BodyInterface_GetCenterOfMassPosition(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_RVec3* position);
+JPH_CAPI void JPH_BodyInterface_SetLinearVelocity(JPH_BodyInterface* _interface, JPH_BodyID bodyID, const JPH_Vec3* velocity);
+JPH_CAPI void JPH_BodyInterface_GetLinearVelocity(JPH_BodyInterface* _interface, JPH_BodyID bodyID, JPH_Vec3* velocity);
+JPH_CAPI void JPH_BodyInterface_GetCenterOfMassPosition(JPH_BodyInterface* _interface, JPH_BodyID bodyID, JPH_RVec3* position);
 
-JPH_CAPI JPH_MotionType JPH_BodyInterface_GetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI void JPH_BodyInterface_SetMotionType(JPH_BodyInterface* interface, JPH_BodyID bodyID, JPH_MotionType motionType, JPH_ActivationMode activationMode);
+JPH_CAPI JPH_MotionType JPH_BodyInterface_GetMotionType(JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_SetMotionType(JPH_BodyInterface* _interface, JPH_BodyID bodyID, JPH_MotionType motionType, JPH_ActivationMode activationMode);
 
-JPH_CAPI float JPH_BodyInterface_GetRestitution(const JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI void JPH_BodyInterface_SetRestitution(JPH_BodyInterface* interface, JPH_BodyID bodyID, float restitution);
+JPH_CAPI float JPH_BodyInterface_GetRestitution(const JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_SetRestitution(JPH_BodyInterface* _interface, JPH_BodyID bodyID, float restitution);
 
-JPH_CAPI float JPH_BodyInterface_GetFriction(const JPH_BodyInterface* interface, JPH_BodyID bodyID);
-JPH_CAPI void JPH_BodyInterface_SetFriction(JPH_BodyInterface* interface, JPH_BodyID bodyID, float friction);
+JPH_CAPI float JPH_BodyInterface_GetFriction(const JPH_BodyInterface* _interface, JPH_BodyID bodyID);
+JPH_CAPI void JPH_BodyInterface_SetFriction(JPH_BodyInterface* _interface, JPH_BodyID bodyID, float friction);
 
 /* Body */
 JPH_CAPI JPH_Shape *JPH_Body_GetShape(const JPH_Body* body);
@@ -320,10 +320,10 @@ JPH_CAPI JPH_Vec3 JPH_Body_GetCenterOfMassPosition(JPH_Body* body);
 
 /* JPH_BroadPhaseLayer */
 typedef struct JPH_BroadPhaseLayerInterface_Procs {
-    uint32_t(JPH_API_CALL* GetNumBroadPhaseLayers)(const JPH_BroadPhaseLayerInterface* interface);
-    JPH_BroadPhaseLayer(JPH_API_CALL* GetBroadPhaseLayer)(const JPH_BroadPhaseLayerInterface* interface, JPH_ObjectLayer layer);
+    uint32_t(JPH_API_CALL* GetNumBroadPhaseLayers)(const JPH_BroadPhaseLayerInterface* _interface);
+    JPH_BroadPhaseLayer(JPH_API_CALL* GetBroadPhaseLayer)(const JPH_BroadPhaseLayerInterface* _interface, JPH_ObjectLayer layer);
 
-    const char* (*GetBroadPhaseLayerName)(const JPH_BroadPhaseLayerInterface* interface, JPH_BroadPhaseLayer layer);
+    const char* (*GetBroadPhaseLayerName)(const JPH_BroadPhaseLayerInterface* _interface, JPH_BroadPhaseLayer layer);
 } JPH_BroadPhaseLayerInterface_Procs;
 
 JPH_CAPI void JPH_BroadPhaseLayerInterface_SetProcs(JPH_BroadPhaseLayerInterface_Procs procs);

@@ -85,7 +85,7 @@ int addShapeCapsule( lua_State * L ) {
 
     float r0 = (float)lua_tonumber(L, 1);
     float height = (float)lua_tonumber(L, 3);
-	JPH_CylinderShapeSettings *cap_shape = JPH_CapsuleShapeSettings_Create(height/2, r0);
+    JPH_CapsuleShapeSettings *cap_shape = JPH_CapsuleShapeSettings_Create(height/2, r0);
     JoltBody *newbody = new JoltBody();
     newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)cap_shape);
     newbody->id = JPH_Body_GetID(newbody->body);
@@ -116,7 +116,7 @@ int addShapeChamferCylinder( lua_State * L ) {
 
     float radius = (float)lua_tonumber(L, 1);
     float height = (float)lua_tonumber(L, 2);
-    JPH_CylinderShapeSettings *settings = JPH_CylinderShapeSettings_Create(height/2.0f, radius);
+    JPH_CylinderShapeSettings *settings = JPH_CylinderShapeSettings_Create(height/2.0f, radius, radius);
     JoltBody *newbody = new JoltBody();
     newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)settings);
     newbody->id = JPH_Body_GetID(newbody->body);
@@ -133,7 +133,7 @@ int addShapeConvexHull( lua_State * L ) {
     int count = lua_tonumber(L, 2);
     const JPH_Vec3 *vertCloud = (JPH_Vec3 *)lua_topointer(L, 3);
 
-    ConvexHullShapeSettings *settings = JPH_ConvexHullShapeSettings_Create(vertCloud, count, maxRadius);
+    JPH_ConvexHullShapeSettings *settings = JPH_ConvexHullShapeSettings_Create(vertCloud, count, maxRadius);
     JoltBody *newbody = new JoltBody();
     newbody->body = JPH_BodyInterface_CreateBody(gInterface, (JPH_BodyCreationSettings *)settings);
     newbody->id = JPH_Body_GetID(newbody->body);
@@ -146,7 +146,7 @@ int addShapeConvexHull( lua_State * L ) {
 
  int worldRayCast( lua_State *L ) {
 
-    const float *p0= (float *)lua_topointer(L, 1);
+    const float *p0 = (float *)lua_topointer(L, 1);
     const float *p1 = (float *)lua_topointer(L, 2);
     //NewtonWorldRayFilterCallback filter_cb = *(NewtonWorldRayFilterCallback *)lua_topointer(L, 3);
     void * const userData = (void * const)lua_topointer(L, 4);
@@ -159,12 +159,12 @@ int addShapeConvexHull( lua_State * L ) {
 int destroyShape(lua_State *L)
 {
     uint32_t collindex = lua_tonumber(L, 1);
-	std::map<uint32_t, JoltShape>::iterator it = gBodies.find(collindex);
+	std::map<uint32_t, JoltBody *>::iterator it = gBodies.find(collindex);
     if(it == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }
-    JPH_Shape_Destroy(it->second->body->GetShape());
+    JPH_Shape_Destroy(JPH_Body_GetShape(it->second->body));
     gBodies.erase(it);
     lua_pushnumber(L, 1);
     return 1;
@@ -173,14 +173,14 @@ int destroyShape(lua_State *L)
 int createMeshFromShape( lua_State *L )
 {
     uint32_t collindex = lua_tonumber(L, 1);
-	std::map<uint32_t, JoltShape>::iterator it = gBodies.find(collindex);
+    std::map<uint32_t, JoltBody *>::iterator it = gBodies.find(collindex);
     if(it == gBodies.end()) {
         lua_pushnil(L);
         return 1;
     }
 
     uint32_t mapping = lua_tonumber(L, 2);
-    const Shape *collision = gBodies[collindex]->body->GetShape();
+    const JoltBody *collision = gBodies[collindex];
 
     //NewtonMesh *mesh = NewtonMeshCreateFromShape( collision );
     // if(mesh) {

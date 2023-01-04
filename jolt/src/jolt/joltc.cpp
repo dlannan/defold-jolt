@@ -91,7 +91,7 @@ static JPH::Quat ToQuat(const JPH_Quat* quat)
     return JPH::Quat(quat->x, quat->y, quat->z, quat->w);
 }
 
-static JPH_Quat FromQuat(const JP::Quat& quat, JPH_Quat* oresultquat)
+static void FromQuat(const JPH_Quat& quat, JPH_Quat* result)
 {
     result->x = quat.x;
     result->y = quat.y;
@@ -792,8 +792,6 @@ JPH_Shape *JPH_Body_GetShape(const JPH_Body* body)
     return joltBody->GetShape();
 }
 
-
-
 JPH_Vec3 JPH_Body_GetPosition(JPH_Body* body)
 {
     JPH_Vec3 output;
@@ -804,8 +802,7 @@ JPH_Vec3 JPH_Body_GetPosition(JPH_Body* body)
 
 void JPH_Body_SetPosition(JPH_Body* body, const JPH_Vec3* position)
 {
-    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
-    joltBody->SetPosition(position);
+    reinterpret_cast<const JPH::Body*>(body)->SetPosition(position);
 }
 
 JPH_Quat JPH_Body_GetRotation(JPH_Body* body)
@@ -818,8 +815,7 @@ JPH_Quat JPH_Body_GetRotation(JPH_Body* body)
 
 void JPH_Body_SetPosition(JPH_Body* body, const JPH_Quat* rotation)
 {
-    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
-    joltBody->SetRotation(rotation);
+    reinterpret_cast<const JPH::Body*>(body)->SetRotation(rotation);
 }
 
 uint32_t JPH_Body_GetUserData(JPH_Body* body)
@@ -830,8 +826,7 @@ uint32_t JPH_Body_GetUserData(JPH_Body* body)
 
 void JPH_Body_SetUserData(JPH_Body* body, uint32_t data)
 {
-    auto joltBody = reinterpret_cast<const JPH::Body*>(body);
-    joltBody->SetUserData((uint64_t)data);
+    reinterpret_cast<const JPH::Body*>(body)->SetUserData((uint64_t)data);
 }
 
 JPH_Vec3 JPH_Body_GetCenterOfMassPosition(JPH_Body* body)
@@ -839,7 +834,7 @@ JPH_Vec3 JPH_Body_GetCenterOfMassPosition(JPH_Body* body)
     JPH_Vec3 output;
     auto posVec = reinterpret_cast<const JPH::Body*>(body)->GetCenterOfMassPosition();
     FromVec3(posVec, &output);
-    retrun output;
+    return output;
 }
 
 bool JPH_Body_IsActive(const JPH_Body* body)

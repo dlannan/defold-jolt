@@ -36,10 +36,10 @@ extern lua_State *gCbL;
 
 extern uint32_t GetId();
 
-extern int SetTableVector( lua_State *L, dFloat *data, const char *name );
+extern int SetTableVector( lua_State *L, float *data, const char *name );
 extern void AddTableIndices( lua_State *L, int count, int *indices );
 extern void AddTableVertices( lua_State *L, int count, const double *vertices );
-extern void AddTableUVs( lua_State *L, int count, const dFloat *uvs );
-extern void AddTableNormals( lua_State *L, int count, const dFloat *normals );
+extern void AddTableUVs( lua_State *L, int count, const float *uvs );
+extern void AddTableNormals( lua_State *L, int count, const float *normals );
 
 #endif // _EXTENSION_NEWTON_HEADER_

@@ -11,7 +11,10 @@
 #include <map>
 
 #include "extension.h"
+#include "extension-body.h"
 #include "extension-shape.h"
+#include "extension-vehicle.h"
+
 
 JPH_PhysicsSystem* gWorld = NULL;
 JPH_BodyInterface* gInterface = NULL;
@@ -72,7 +75,7 @@ static int Update( lua_State *L )
         JPH_Quat jrot = JPH_Body_GetRotation(body);
         float rot[4] = {jrot.x, jrot.y, jrot.z, jrot.w};
         
-        JPH_Vec3 jpos = JPH_Body_GetPosition(body, pos);
+        JPH_Vec3 jpos = JPH_Body_GetPosition(body);
         float pos[4] = {jpos.x, jpos.y, jpos.z, 0.0f};
         
         lua_pushnumber(L, bodyit->first); 
